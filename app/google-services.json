@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "477661890697",
+    "project_id": "manitas-71905",
+    "storage_bucket": "manitas-71905.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:477661890697:android:94cdef5d2febf14c5b9e58",
+        "android_client_info": {
+          "package_name": "com.example.manitas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlmI0KikpIGnzaan1qg2pu9CJTFE3eWWE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
