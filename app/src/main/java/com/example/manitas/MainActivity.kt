@@ -26,6 +26,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
+
         }
     }
 }
@@ -33,7 +34,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
-        text = "Hello $name! FUNCIONA????",
+        text = "Hello $name! FUNCIONA???? no funciona",
         modifier = modifier
     )
 }
