@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.manitas.navigation.MainNavigation
 import com.example.manitas.ui.theme.ManitasTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,29 +21,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             ManitasTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                    MainNavigation(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
 
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name! FUNCIONA???? no funciona",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ManitasTheme {
-        Greeting("Android")
     }
 }

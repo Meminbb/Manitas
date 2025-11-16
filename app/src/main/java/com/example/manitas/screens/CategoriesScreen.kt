@@ -31,15 +31,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 
 @Preview(showBackground = true)
 @Composable
 fun CategoriesScreenPreview() {
     val sampleCategories = com.example.manitas.model.getCategories()
+    val nav = rememberNavController()
 
     CategoriesScreen(
         categories = sampleCategories,
+        nav = nav,
         onItemClick = {}
     )
 }
@@ -47,6 +51,7 @@ fun CategoriesScreenPreview() {
 @Composable
 fun CategoriesScreen(
     categories: List<Category>,
+    nav: NavHostController,
     onItemClick: (Category) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -55,10 +60,11 @@ fun CategoriesScreen(
 
             Icon(
                 imageVector = Icons.Filled.ArrowBackIosNew,
-                contentDescription = null,
+                contentDescription = "Volver",
                 modifier = Modifier.size(60.dp)
                     .padding(start = 16.dp, top = 24.dp)
-                    //aqui va el clickable
+                    .clickable{nav.popBackStack()}
+
 
             )
 
