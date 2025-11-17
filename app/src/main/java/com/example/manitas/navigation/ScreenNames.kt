@@ -6,6 +6,12 @@ sealed class ScreenNames (val route: String) {
         fun createRoute(id: Int) = "videosporcat/$id"
     }
 
+    //----------------------Kevin---------------------
+    data object LoginScreen: ScreenNames("login")
+    data object LoginUser: ScreenNames("loginuser")
+    data object SessionScreen: ScreenNames("session")
+    data object CreateUserScreen: ScreenNames("createuser")
+
     data object Menu: ScreenNames("menu")
     data object Progreso: ScreenNames("progreso")
     data object Notificaciones: ScreenNames("notificaciones")

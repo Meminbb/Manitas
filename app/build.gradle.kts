@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui.text)
+    implementation(libs.androidx.ui)
 
     // Tests
     testImplementation(libs.junit)
@@ -68,6 +69,10 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    // Video
+    implementation("androidx.media3:media3-exoplayer:1.4.1")
+    implementation("androidx.media3:media3-ui:1.4.1")
 
     implementation("com.google.firebase:firebase-auth-ktx:23.2.1")  // Esta dependencia se utiliza para la autenticación
     implementation("com.google.firebase:firebase-firestore-ktx:25.1.4")  // Esta dependendencia se utiliza para la firestore database

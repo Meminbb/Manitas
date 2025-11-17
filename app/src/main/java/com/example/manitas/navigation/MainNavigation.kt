@@ -14,6 +14,10 @@ import com.example.manitas.screens.CategoriesScreen
 import com.example.manitas.screens.VideosporCatScreen
 import com.example.manitas.screens.favoritos.FavoritosScreen
 import com.example.manitas.screens.favoritos.VideosFavoritosScreen
+import com.example.manitas.screens.login.LoginScreen
+import com.example.manitas.screens.login.LoginUserScreen
+import com.example.manitas.screens.login.SessionScreen
+import com.example.manitas.screens.login.CreateUserScreen
 import com.example.manitas.screens.progreso.ProgresoScreen
 import com.example.manitas.screens.notificaciones.NotificacionesScreen
 
@@ -23,7 +27,7 @@ fun MainNavigation(modifier: Modifier = Modifier) {
 
     NavHost(
         navController = nav,
-        startDestination = ScreenNames.Menu.route,
+        startDestination = ScreenNames.LoginScreen.route,
         modifier = modifier
     ) {
 
@@ -58,6 +62,19 @@ fun MainNavigation(modifier: Modifier = Modifier) {
             FavoritosScreen(nav = nav)
         }
 
+        // ---------------------Kevin-------------------------
+        composable(ScreenNames.LoginScreen.route) {
+            LoginScreen(nav = nav)
+        }
+        composable(ScreenNames.LoginUser.route) {
+            LoginUserScreen(nav = nav)
+        }
+        composable(ScreenNames.SessionScreen.route){
+            SessionScreen(nav = nav)
+        }
+        composable(ScreenNames.CreateUserScreen.route){
+            CreateUserScreen(nav = nav)
+        }
 
         composable(
             route = ScreenNames.FavoritoDetalle.route,
