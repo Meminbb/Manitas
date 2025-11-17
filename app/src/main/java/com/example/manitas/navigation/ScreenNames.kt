@@ -5,6 +5,7 @@ sealed class ScreenNames (val route: String) {
     data object VideosporCat: ScreenNames("videosporcat/{id}") {
         fun createRoute(id: Int) = "videosporcat/$id"
     }
+    data object NotificacionesAdd: ScreenNames("notificaciones_add")
 
     data object Menu: ScreenNames("menu")
     data object Progreso: ScreenNames("progreso")

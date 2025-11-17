@@ -16,6 +16,8 @@ import com.example.manitas.screens.favoritos.FavoritosScreen
 import com.example.manitas.screens.favoritos.VideosFavoritosScreen
 import com.example.manitas.screens.progreso.ProgresoScreen
 import com.example.manitas.screens.notificaciones.NotificacionesScreen
+import com.example.manitas.screens.notificaciones.NotificacionesAddScreen
+
 
 @Composable
 fun MainNavigation(modifier: Modifier = Modifier) {
@@ -31,6 +33,9 @@ fun MainNavigation(modifier: Modifier = Modifier) {
             MenuScreen(
                 onNavigate = { route -> nav.navigate(route) }
             )
+        }
+        composable(ScreenNames.NotificacionesAdd.route) {
+            NotificacionesAddScreen(nav = nav)
         }
 
         composable(ScreenNames.Categorias.route) {
