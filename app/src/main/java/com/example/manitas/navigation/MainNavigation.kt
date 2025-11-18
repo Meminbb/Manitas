@@ -20,6 +20,9 @@ import com.example.manitas.screens.login.SessionScreen
 import com.example.manitas.screens.login.CreateUserScreen
 import com.example.manitas.screens.progreso.ProgresoScreen
 import com.example.manitas.screens.notificaciones.NotificacionesScreen
+import com.example.manitas.screens.notificaciones.NotificacionesAddScreen
+import com.example.manitas.screens.quiz.QuizScreen
+
 
 @Composable
 fun MainNavigation(modifier: Modifier = Modifier) {
@@ -35,6 +38,9 @@ fun MainNavigation(modifier: Modifier = Modifier) {
             MenuScreen(
                 onNavigate = { route -> nav.navigate(route) }
             )
+        }
+        composable(ScreenNames.NotificacionesAdd.route) {
+            NotificacionesAddScreen(nav = nav)
         }
 
         composable(ScreenNames.Categorias.route) {
@@ -104,5 +110,11 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                 videos = videos
             )
         }
+
+        composable(ScreenNames.Quiz.route) {
+            QuizScreen()
+        }
+
+
     }
 }
