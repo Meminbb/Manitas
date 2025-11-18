@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AgentMigrationStateService">
+    <option name="pendingSessionIds">
+      <option value="1aa81374-0ef9-4853-b8e0-ba41cd6dd9a9" />
+    </option>
+    <option name="pendingTurns">
+      <map>
+        <entry key="1aa81374-0ef9-4853-b8e0-ba41cd6dd9a9">
+          <value>
+            <set>
+              <option value="24e31254-4d1e-45a4-adf5-219963ec9371" />
+              <option value="7ca0a23f-d782-4236-954f-e1f4020df40a" />
+              <option value="425fb598-8599-4cdf-9db5-77eb066497e0" />
+              <option value="b6bbf03b-e292-4039-b9f5-03a547e3c574" />
+            </set>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <pendingWorkingSetItems>
+      <entry key="1aa81374-0ef9-4853-b8e0-ba41cd6dd9a9">
+        <set>
+          <option value="file://$PROJECT_DIR$/app/src/main/java/com/example/manitas/screens/menu/MenuScreen.kt" />
+        </set>
+      </entry>
+    </pendingWorkingSetItems>
+  </component>
+</project>

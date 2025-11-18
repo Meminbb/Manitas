@@ -21,6 +21,7 @@ import com.example.manitas.screens.login.CreateUserScreen
 import com.example.manitas.screens.progreso.ProgresoScreen
 import com.example.manitas.screens.notificaciones.NotificacionesScreen
 import com.example.manitas.screens.notificaciones.NotificacionesAddScreen
+import com.example.manitas.screens.quiz.QuizScreen
 
 
 @Composable
@@ -109,5 +110,11 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                 videos = videos
             )
         }
+
+        composable(ScreenNames.Quiz.route) {
+            QuizScreen()
+        }
+
+
     }
 }

@@ -22,4 +22,5 @@ sealed class ScreenNames (val route: String) {
         fun createRoute(id: Int) = "favoritoDetalle/$id"
     }
 
+    data object Quiz : ScreenNames("quiz")
 }
