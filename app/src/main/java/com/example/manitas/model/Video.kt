@@ -1,16 +1,26 @@
 package com.example.manitas.model
 
-class Video (
+import com.example.manitas.R
+
+enum class MediaType {
+    VIDEO,
+    IMAGE
+}
+
+class Video(
     val id: Int,
     val catId: Int,
     val name: String,
-    val url: String,
+    val resId: Int,
+    val type: MediaType
 )
 
 fun getVideos(): List<Video> = listOf(
-    Video(1,1,"Manzana", "link o video de manzana"),
-    Video(2,1,"Naranja","link o video de narnja"),
-    Video(3,1,"Banano","link o video de banano"),
-    Video(4,2,"A", "link o video de A"),
+    Video(1, 1, "Manzana", R.raw.frutas_manzana, MediaType.VIDEO),
+    Video(2, 1, "Naranja", R.raw.frutas_naranja, MediaType.VIDEO),
+    Video(3, 1, "Banano", R.raw.frutas_banano, MediaType.VIDEO),
 
+    Video(4, 2, "A", R.raw.letras_a, MediaType.IMAGE),
+    Video(5, 2, "B", R.raw.letras_b, MediaType.IMAGE),
+    Video(6, 2, "C", R.raw.letras_c, MediaType.IMAGE),
 )
