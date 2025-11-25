@@ -1,25 +1,34 @@
 package com.example.manitas.screens
 
+import android.annotation.SuppressLint
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.net.toUri
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.manitas.model.MediaType
 import com.example.manitas.model.Video
-<<<<<<< Updated upstream
-=======
 import com.example.manitas.model.getVideos
 
 @SuppressLint("LocalContextResourcesRead")
@@ -170,50 +179,15 @@ fun VideosporCatScreen(
 
     }
 }
->>>>>>> Stashed changes
 
 @Preview(showBackground = true)
 @Composable
 fun VideosporCatScreenPreview() {
-    val sampleVideos = com.example.manitas.model.getVideos()
-        .filter { it.catId == 1 } // simula frutas
-
+    val sampleVideos = getVideos().filter { it.catId == 1 }
+    val nav = rememberNavController()
     VideosporCatScreen(
         idCategory = 1,
-        videos = sampleVideos
+        videos = sampleVideos,
+        nav = nav
     )
-}
-
-@Composable
-fun VideosporCatScreen (
-    idCategory: Int,
-    videos: List<Video>
-){
-    Column(modifier = Modifier.fillMaxSize()) {
-
-        Row(modifier = Modifier.padding(top = 15.dp, bottom = 15.dp)) {
-
-            Icon(
-                imageVector = Icons.Filled.ArrowBackIosNew,
-                contentDescription = null,
-                modifier = Modifier.size(60.dp)
-                    .padding(start = 16.dp, top = 24.dp)
-                //aqui va el clickable
-
-            )
-
-            Box(
-                modifier = Modifier.padding(top = 36.dp, start = 17.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Frutas", //aqui va el nombre de la categoria
-                    fontSize = 50.sp,
-                )
-            }
-        }
-
-        //poner la imagen con su nombre como tipo carrusel
-
-    }
 }
