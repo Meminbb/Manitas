@@ -4,7 +4,13 @@ class Video (
     val id: Int,
     val catId: Int,
     val name: String,
+<<<<<<< Updated upstream
     val url: String,
+=======
+    val resId: Int,
+    val type: MediaType,
+    var fav: Boolean = false
+>>>>>>> Stashed changes
 )
 
 fun getVideos(): List<Video> = listOf(

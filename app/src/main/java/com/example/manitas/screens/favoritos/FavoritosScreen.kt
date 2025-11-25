@@ -119,4 +119,8 @@ fun FavoritosScreen(
             }
         }
     }
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes
