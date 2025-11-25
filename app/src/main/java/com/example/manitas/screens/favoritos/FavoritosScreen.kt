@@ -19,12 +19,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.manitas.model.FavoriteItem
 import com.example.manitas.model.getFavoritos
 import com.example.manitas.navigation.ScreenNames
+import com.example.manitas.screens.login.SessionScreen
 
 @Composable
 fun FavoritosScreen(
@@ -119,4 +122,12 @@ fun FavoritosScreen(
             }
         }
     }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun FavoritesScreenPreview() {
+    val nav = rememberNavController()
+    FavoritosScreen(nav)
 }
