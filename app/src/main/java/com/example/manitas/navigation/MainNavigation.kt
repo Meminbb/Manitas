@@ -34,11 +34,20 @@ fun MainNavigation(modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
 
-        composable(ScreenNames.Menu.route) {
+        composable(
+            route = ScreenNames.Menu.route + "/{userId}",
+            arguments = listOf(
+                navArgument("userId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+
             MenuScreen(
+                userId = userId,
                 onNavigate = { route -> nav.navigate(route) }
             )
         }
+
         composable(ScreenNames.NotificacionesAdd.route) {
             NotificacionesAddScreen(nav = nav)
         }

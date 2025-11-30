@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.manitas.R
+import com.example.manitas.navigation.ScreenNames
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -160,13 +161,11 @@ fun signInWithEmail(email: String, password: String, auth: FirebaseAuth, nav: Na
     auth.signInWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                // If the login is successful, get the user's UID
                 val user = auth.currentUser
-                val userId = user?.uid // This is the user ID
+                val userId = user?.uid
 
                 if (userId != null) {
-                    // Navigate to the "menu" screen and pass the user ID
-                    nav.navigate("menu/$userId") // Pass UID as part of the route
+                    nav.navigate("${ScreenNames.Menu.route}/$userId")
                 }
             } else {
                 // If authentication fails, show error
