@@ -7,7 +7,6 @@ sealed class ScreenNames (val route: String) {
     }
     data object NotificacionesAdd: ScreenNames("notificaciones_add")
 
-    //----------------------Kevin---------------------
     data object LoginScreen: ScreenNames("login")
     data object LoginUser: ScreenNames("loginuser")
     data object SessionScreen: ScreenNames("session")
@@ -21,6 +20,8 @@ sealed class ScreenNames (val route: String) {
     data object FavoritoDetalle : ScreenNames("favoritoDetalle/{id}") {
         fun createRoute(id: Int) = "favoritoDetalle/$id"
     }
-
     data object Quiz : ScreenNames("quiz")
+    data object SeñaDetail : ScreenNames("seña_detail/{id}") {
+        fun createRoute(id: String) = "seña_detail/$id"
+    }
 }
