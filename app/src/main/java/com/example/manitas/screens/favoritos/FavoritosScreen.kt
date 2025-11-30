@@ -40,7 +40,7 @@ fun FavoritosScreen(
             .background(Color.White)
             .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
-        // Top bar
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(bottom = 20.dp)
@@ -62,7 +62,7 @@ fun FavoritosScreen(
             )
         }
 
-        // Lista más grande
+
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -71,7 +71,7 @@ fun FavoritosScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(90.dp)   // 🔥 ALTO DEL ITEM
+                        .height(90.dp)
                         .padding(vertical = 6.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -81,7 +81,7 @@ fun FavoritosScreen(
                     ) {
                         Text(
                             text = fav.title,
-                            fontSize = 24.sp,  // 🔥 TEXTO MÁS GRANDE
+                            fontSize = 24.sp,
                             fontWeight = FontWeight.SemiBold
                         )
                         Text(
@@ -91,10 +91,10 @@ fun FavoritosScreen(
                         )
                     }
 
-                    // Botón grande
+
                     Box(
                         modifier = Modifier
-                            .size(52.dp)  // 🔥 BOTON MÁS GRANDE
+                            .size(52.dp)
                             .clip(CircleShape)
                             .background(Color(0xFFD3E8F5)),
                         contentAlignment = Alignment.Center
@@ -109,7 +109,7 @@ fun FavoritosScreen(
                             Icon(
                                 imageVector = Icons.Default.PlayArrow,
                                 contentDescription = "Ver favorito",
-                                modifier = Modifier.size(36.dp) // 🔥 ICONO MÁS GRANDE
+                                modifier = Modifier.size(36.dp)
                             )
                         }
                     }
