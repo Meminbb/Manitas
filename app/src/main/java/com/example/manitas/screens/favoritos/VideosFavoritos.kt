@@ -27,6 +27,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.manitas.model.FavoriteItem
 import com.example.manitas.model.getFavoritos
+import kotlin.collections.indexOfFirst
+import kotlin.collections.lastIndex
 
 @Composable
 fun VideosFavoritosScreen(

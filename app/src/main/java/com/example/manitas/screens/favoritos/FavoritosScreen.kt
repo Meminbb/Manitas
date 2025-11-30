@@ -122,8 +122,8 @@ fun FavoritosScreen(
             }
         }
     }
-}
 
+}
 
 @Preview(showBackground = true)
 @Composable
@@ -131,3 +131,4 @@ fun FavoritesScreenPreview() {
     val nav = rememberNavController()
     FavoritosScreen(nav)
 }
+

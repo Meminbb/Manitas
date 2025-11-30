@@ -8,24 +8,39 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.manitas.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+
 
 @Composable
 fun CreateUserScreen(nav: NavHostController) {
+
     val bgColor = Color(194, 216, 229)
+
+    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+
+    var password by remember { mutableStateOf("") }
+    var repeatPassword by remember { mutableStateOf("") }
+
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(false) }
+
+    val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
 
     Column(
         modifier = Modifier
@@ -48,24 +63,20 @@ fun CreateUserScreen(nav: NavHostController) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 Image(
                     painter = painterResource(id = R.drawable.logo),
                     contentDescription = "App Logo",
                     modifier = Modifier.size(120.dp)
                 )
-
             }
         }
+
         Column(
             modifier = Modifier
                 .weight(1.4f)
                 .fillMaxWidth()
                 .clip(
-                    RoundedCornerShape(
-                        topStart = 32.dp,
-                        topEnd = 32.dp
-                    )
+                    RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
                 )
                 .background(Color.White)
                 .padding(horizontal = 32.dp, vertical = 60.dp),
@@ -84,11 +95,6 @@ fun CreateUserScreen(nav: NavHostController) {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            var username by remember { mutableStateOf("") }
-            var email by remember { mutableStateOf("") }
-            var password by remember { mutableStateOf("") }
-            var repeatPassword by remember { mutableStateOf("") }
-
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(18.dp),
@@ -101,41 +107,120 @@ fun CreateUserScreen(nav: NavHostController) {
                     label = { Text("Nombre de usuario") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    )
                 )
 
                 OutlinedTextField(
                     value = email,
-                    onValueChange = { email = it },
+                    onValueChange = { email = it.replace(" ","").lowercase() },
                     label = { Text("Correo electrónico") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    )
                 )
-
                 OutlinedTextField(
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = { password = it.replace(" ", "") },
                     label = { Text("Contraseña") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    )
                 )
 
                 OutlinedTextField(
                     value = repeatPassword,
-                    onValueChange = { repeatPassword = it },
+                    onValueChange = { repeatPassword = it.replace(" ", "") },
                     label = { Text("Repetir contraseña") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    )
                 )
             }
 
             Spacer(modifier = Modifier.height(25.dp))
 
             Button(
-                onClick = { nav.navigate("menu") },
+                onClick = {
+                    val trimmedEmail = email.trim()
+                    val trimmedUsername = username.trim()
+
+                    if (trimmedUsername.isEmpty() ||
+                        trimmedEmail.isEmpty() ||
+                        password.isEmpty() ||
+                        repeatPassword.isEmpty()
+                    ) {
+                        errorMessage = "Llena todos los campos."
+                        return@Button
+                    }
+
+                    if (password != repeatPassword) {
+                        errorMessage = "Las contraseñas no coinciden."
+                        return@Button
+                    }
+
+                    if (password.length < 6) {
+                        errorMessage = "La contraseña debe tener mínimo 6 caracteres."
+                        return@Button
+                    }
+
+                    isLoading = true
+                    errorMessage = null
+
+
+                    auth.createUserWithEmailAndPassword(trimmedEmail, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val userId = task.result?.user?.uid
+
+                                if (userId != null) {
+                                    val userData = hashMapOf(
+                                        "username" to trimmedUsername,
+                                        "email" to trimmedEmail
+                                    )
+
+                                    db.collection("users")
+                                        .document(userId)
+                                        .set(userData)
+                                        .addOnSuccessListener {
+                                            isLoading = false
+                                            nav.navigate("menu")
+                                        }
+                                        .addOnFailureListener { e ->
+                                            isLoading = false
+                                            errorMessage = "Error guardando usuario: ${e.message}"
+                                        }
+                                }
+                            } else {
+                                isLoading = false
+                                errorMessage =
+                                    task.exception?.localizedMessage ?: "Error al crear la cuenta."
+                            }
+                        }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp),
@@ -143,9 +228,22 @@ fun CreateUserScreen(nav: NavHostController) {
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFBAD1E1),
                     contentColor = Color.Black
-                )
+                ),
+                enabled = !isLoading
             ) {
-                Text("Crear Cuenta", fontSize = 18.sp)
+                Text(
+                    if (isLoading) "Creando..." else "Crear Cuenta",
+                    fontSize = 18.sp
+                )
+            }
+
+            if (errorMessage != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = errorMessage!!,
+                    color = Color.Red,
+                    fontSize = 14.sp
+                )
             }
         }
     }

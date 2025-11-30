@@ -167,13 +167,11 @@ fun VideosporCatScreen(
                 )
             }
 
-            var isFavorite by remember { mutableStateOf(false) }
-
-            IconButton(onClick = { isFavorite = !isFavorite }) {
+            IconButton(onClick = { current.fav = !current.fav }) {
                 Icon(
                     imageVector = Icons.Default.Favorite,
                     contentDescription = "Fav",
-                    tint = if (isFavorite) Color.Red else Color.Gray,
+                    tint = if (current.fav) Color.Red else Color.Gray,
                     modifier = Modifier.size(28.dp)
                 )
             }
