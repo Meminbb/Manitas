@@ -30,6 +30,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.manitas.model.MediaType
 import com.example.manitas.model.Video
 import com.example.manitas.model.getVideos
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 
 @SuppressLint("LocalContextResourcesRead")
 @Composable
@@ -40,6 +43,27 @@ fun VideosporCatScreen(
 ) {
     var index by remember { mutableStateOf(0) }
     val current = videos[index]
+
+    val auth = FirebaseAuth.getInstance()
+    val userId = auth.currentUser?.uid
+
+    val db = FirebaseFirestore.getInstance()
+
+    var favSet by remember { mutableStateOf<Set<Int>>(emptySet()) }
+
+    LaunchedEffect(userId) {
+        if (userId == null) return@LaunchedEffect
+
+        db.collection("users")
+            .document(userId)
+            .get()
+            .addOnSuccessListener { doc ->
+                val list = doc.get("Fav") as? List<Number>
+                favSet = list?.map { it.toInt() }?.toSet() ?: emptySet()
+            }
+    }
+
+    val isCurrentFav = favSet.contains(current.id)
 
     Column(
         modifier = Modifier
@@ -66,6 +90,7 @@ fun VideosporCatScreen(
                 fontWeight = FontWeight.Bold
             )
         }
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -83,6 +108,7 @@ fun VideosporCatScreen(
                     contentDescription = "Anterior"
                 )
             }
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth(0.75f)
@@ -167,16 +193,30 @@ fun VideosporCatScreen(
                 )
             }
 
-            IconButton(onClick = { current.fav = !current.fav }) {
+            IconButton(
+                onClick = {
+                    if (userId == null) return@IconButton
+
+                    val docRef = db.collection("users").document(userId)
+
+                    if (favSet.contains(current.id)) {
+
+                        favSet = favSet - current.id
+                        docRef.update("Fav", FieldValue.arrayRemove(current.id))
+                    } else {
+                        favSet = favSet + current.id
+                        docRef.update("Fav", FieldValue.arrayUnion(current.id))
+                    }
+                }
+            ) {
                 Icon(
                     imageVector = Icons.Default.Favorite,
                     contentDescription = "Fav",
-                    tint = if (current.fav) Color.Red else Color.Gray,
+                    tint = if (isCurrentFav) Color.Red else Color.Gray,
                     modifier = Modifier.size(28.dp)
                 )
             }
         }
-
     }
 }
 

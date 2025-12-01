@@ -19,15 +19,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.manitas.R
+import com.example.manitas.datastore.UserDataStore
 import com.example.manitas.navigation.ScreenNames
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun SessionScreen(nav: NavHostController) {
     val bgColor = Color(194, 216, 229)
     val auth = FirebaseAuth.getInstance()
 
-    // Variables to hold input values
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
@@ -144,28 +147,29 @@ fun SessionScreen(nav: NavHostController) {
                         auth.signInWithEmailAndPassword(trimmedEmail, trimmedPassword)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
+
                                     val userId = auth.currentUser?.uid
                                     if (userId != null) {
-                                        nav.navigate(ScreenNames.Menu.route + "/$userId") {
-                                            popUpTo(ScreenNames.LoginScreen.route) { inclusive = true }
+                                        val context = nav.context
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            UserDataStore.saveUserId(context, userId)
                                         }
                                     }
+
+                                    nav.navigate(ScreenNames.Menu.route) {
+                                        popUpTo(ScreenNames.LoginScreen.route) { inclusive = true }
+                                    }
+
                                 } else {
                                     errorMessage = "Correo o contraseña incorrecta"
                                 }
                             }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFBAD1E1),
-                        contentColor = Color.Black
-                    )
+                    }
                 ) {
-                    Text(
-                        text = "Iniciar sesión",
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text("Iniciar sesión",
+                        fontWeight = FontWeight.Bold)
                 }
+
 
             }
         }

@@ -31,6 +31,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,10 +47,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.manitas.datastore.UserDataStore
 import com.example.manitas.navigation.ScreenNames
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-
-// -------- helpers para leer de /raw --------
 
 @Composable
 fun getImageFromRaw(resourceName: String): Bitmap? {
@@ -75,38 +76,38 @@ fun getRawResourceFiles(): List<String> {
     )
 }
 
-// -------- pantalla de menú --------
-
 @Composable
 fun MenuScreen(
-    userId: String,
     onNavigate: (String) -> Unit
 ) {
-    var query by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
-    // username desde firestore
+    val userIdFlow = UserDataStore.getUserId(context)
+    val userId by userIdFlow.collectAsState(initial = null)
+
     var username by remember { mutableStateOf<String?>(null) }
     val db = FirebaseFirestore.getInstance()
 
     LaunchedEffect(userId) {
-        db.collection("users")
-            .document(userId)
-            .get()
-            .addOnSuccessListener { doc ->
-                username = doc.getString("username") ?: "Usuario"
-            }
-            .addOnFailureListener {
-                username = "Usuario"
-            }
+        if (userId != null) {
+            db.collection("users")
+                .document(userId!!)
+                .get()
+                .addOnSuccessListener { doc ->
+                    username = doc.getString("username") ?: "Usuario"
+                }
+                .addOnFailureListener {
+                    username = "Usuario"
+                }
+        }
     }
 
+    var query by remember { mutableStateOf("") }
     val sendas = getRawResourceFiles()
 
     val filteredSendas = if (query.isNotEmpty()) {
         sendas.filter { it.contains(query, ignoreCase = true) }
-    } else {
-        emptyList()
-    }
+    } else emptyList()
 
     Column(
         modifier = Modifier
@@ -115,19 +116,21 @@ fun MenuScreen(
             .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        // saludo con nombre
+
         Text(
-            text = "Hola, ${username ?: "Cargando..."}",
+            text = when {
+                username != null -> "Hola, $username"
+                userId == null -> "Cargando..."
+                else -> "Cargando..."
+            },
             fontSize = 40.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 30.dp)
-                .padding(top = 40.dp),
+                .padding(bottom = 30.dp, top = 40.dp),
             textAlign = TextAlign.Center
         )
 
-        // fila: notificaciones + barra de búsqueda
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -169,18 +172,11 @@ fun MenuScreen(
 
         Spacer(Modifier.height(10.dp))
 
-        // resultados de búsqueda de señas
         if (query.isNotEmpty()) {
             if (filteredSendas.isEmpty()) {
-                Text(
-                    text = "No se encontraron resultados",
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(16.dp)
-                )
+                Text("No se encontraron resultados", fontSize = 14.sp)
             } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                LazyColumn {
                     items(filteredSendas) { seña ->
                         Row(
                             modifier = Modifier
@@ -213,7 +209,6 @@ fun MenuScreen(
             }
         }
 
-        // carta grande: diccionario
         MenuCard(
             title = "Diccionario de señas",
             containerColor = Color(0xFFEDF3F7),
@@ -225,7 +220,6 @@ fun MenuScreen(
 
         Spacer(Modifier.height(20.dp))
 
-        // fila: quizzes + progreso/favoritos
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -240,9 +234,7 @@ fun MenuScreen(
             )
 
             Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 MenuCard(
@@ -261,12 +253,13 @@ fun MenuScreen(
                         .fillMaxWidth()
                         .height(137.dp),
                     leading = { Icon(Icons.Default.Favorite, null) },
-                    onClick = { onNavigate(ScreenNames.Favoritos.route) }
+                    onClick = { onNavigate(ScreenNames.FavoritoDetalle.route) }
                 )
             }
         }
     }
 }
+
 
 @Composable
 private fun MenuCard(

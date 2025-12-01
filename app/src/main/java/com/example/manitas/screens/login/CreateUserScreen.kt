@@ -21,9 +21,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.manitas.R
+import com.example.manitas.datastore.UserDataStore
 import com.example.manitas.navigation.ScreenNames
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -200,15 +204,22 @@ fun CreateUserScreen(nav: NavHostController) {
                                 if (userId != null) {
                                     val userData = hashMapOf(
                                         "username" to trimmedUsername,
-                                        "email" to trimmedEmail
+                                        "email" to trimmedEmail,
+                                        "Fav" to emptyList<Int>(),
+                                        "quizAv" to emptyList<Int>()
                                     )
 
                                     db.collection("users")
                                         .document(userId)
                                         .set(userData)
                                         .addOnSuccessListener {
+                                            val context = nav.context
+
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                UserDataStore.saveUserId(context, userId)
+                                            }
                                             isLoading = false
-                                            nav.navigate("${ScreenNames.Menu.route}/$userId")
+                                            nav.navigate(ScreenNames.Menu.route)
                                         }
                                         .addOnFailureListener { e ->
                                             isLoading = false

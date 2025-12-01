@@ -12,7 +12,6 @@ import com.example.manitas.model.getCategories
 import com.example.manitas.model.getVideos
 import com.example.manitas.screens.CategoriesScreen
 import com.example.manitas.screens.VideosporCatScreen
-import com.example.manitas.screens.favoritos.FavoritosScreen
 import com.example.manitas.screens.favoritos.VideosFavoritosScreen
 import com.example.manitas.screens.login.LoginScreen
 import com.example.manitas.screens.login.LoginUserScreen
@@ -34,16 +33,8 @@ fun MainNavigation(modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
 
-        composable(
-            route = ScreenNames.Menu.route + "/{userId}",
-            arguments = listOf(
-                navArgument("userId") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId") ?: ""
-
+        composable(ScreenNames.Menu.route) {
             MenuScreen(
-                userId = userId,
                 onNavigate = { route -> nav.navigate(route) }
             )
         }
@@ -73,9 +64,6 @@ fun MainNavigation(modifier: Modifier = Modifier) {
             NotificacionesScreen(nav = nav)
         }
 
-        composable(ScreenNames.Favoritos.route) {
-            FavoritosScreen(nav = nav)
-        }
 
         // ---------------------Kevin-------------------------
         composable(ScreenNames.LoginScreen.route) {
@@ -99,8 +87,7 @@ fun MainNavigation(modifier: Modifier = Modifier) {
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getInt("id") ?: 0
             VideosFavoritosScreen(
-                nav = nav,
-                favoritoId = id
+                nav = nav
             )
         }
 
