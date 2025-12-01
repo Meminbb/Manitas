@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.manitas.R
+import com.example.manitas.navigation.ScreenNames
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -207,7 +208,7 @@ fun CreateUserScreen(nav: NavHostController) {
                                         .set(userData)
                                         .addOnSuccessListener {
                                             isLoading = false
-                                            nav.navigate("menu")
+                                            nav.navigate("${ScreenNames.Menu.route}/$userId")
                                         }
                                         .addOnFailureListener { e ->
                                             isLoading = false

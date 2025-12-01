@@ -24,13 +24,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,23 +47,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.manitas.navigation.ScreenNames
+import com.google.firebase.firestore.FirebaseFirestore
 
-
+// -------- helpers para leer de /raw --------
 
 @Composable
 fun getImageFromRaw(resourceName: String): Bitmap? {
-    val resourceId = LocalContext.current.resources.getIdentifier(resourceName, "raw", LocalContext.current.packageName)
+    val context = LocalContext.current
+    val resourceId = context.resources.getIdentifier(resourceName, "raw", context.packageName)
     if (resourceId == 0) return null
 
-    val inputStream = LocalContext.current.resources.openRawResource(resourceId)
+    val inputStream = context.resources.openRawResource(resourceId)
     return BitmapFactory.decodeStream(inputStream)
 }
 
-
 @Composable
 fun getVideoUriFromRaw(resourceName: String): Uri {
-    val resourceId = LocalContext.current.resources.getIdentifier(resourceName, "raw", LocalContext.current.packageName)
-    return Uri.parse("android.resource://${LocalContext.current.packageName}/$resourceId")
+    val context = LocalContext.current
+    val resourceId = context.resources.getIdentifier(resourceName, "raw", context.packageName)
+    return Uri.parse("android.resource://${context.packageName}/$resourceId")
 }
 
 fun getRawResourceFiles(): List<String> {
@@ -73,12 +75,30 @@ fun getRawResourceFiles(): List<String> {
     )
 }
 
+// -------- pantalla de menú --------
+
 @Composable
 fun MenuScreen(
-    onNavigate: (String) -> Unit,
-    userName: String = "Karla"
+    userId: String,
+    onNavigate: (String) -> Unit
 ) {
     var query by remember { mutableStateOf("") }
+
+    // username desde firestore
+    var username by remember { mutableStateOf<String?>(null) }
+    val db = FirebaseFirestore.getInstance()
+
+    LaunchedEffect(userId) {
+        db.collection("users")
+            .document(userId)
+            .get()
+            .addOnSuccessListener { doc ->
+                username = doc.getString("username") ?: "Usuario"
+            }
+            .addOnFailureListener {
+                username = "Usuario"
+            }
+    }
 
     val sendas = getRawResourceFiles()
 
@@ -95,17 +115,19 @@ fun MenuScreen(
             .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
+        // saludo con nombre
         Text(
-            text = "Hola, $userName",
-            fontSize = 50.sp,
+            text = "Hola, ${username ?: "Cargando..."}",
+            fontSize = 40.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 30.dp)
-                .padding(top = 60.dp),
+                .padding(top = 40.dp),
             textAlign = TextAlign.Center
         )
 
+        // fila: notificaciones + barra de búsqueda
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -147,6 +169,7 @@ fun MenuScreen(
 
         Spacer(Modifier.height(10.dp))
 
+        // resultados de búsqueda de señas
         if (query.isNotEmpty()) {
             if (filteredSendas.isEmpty()) {
                 Text(
@@ -169,7 +192,11 @@ fun MenuScreen(
                         ) {
                             val image = getImageFromRaw(seña)
                             image?.let {
-                                Image(bitmap = it.asImageBitmap(), contentDescription = seña)
+                                Image(
+                                    bitmap = it.asImageBitmap(),
+                                    contentDescription = seña,
+                                    modifier = Modifier.size(64.dp)
+                                )
                             }
 
                             Spacer(modifier = Modifier.width(10.dp))
@@ -186,6 +213,7 @@ fun MenuScreen(
             }
         }
 
+        // carta grande: diccionario
         MenuCard(
             title = "Diccionario de señas",
             containerColor = Color(0xFFEDF3F7),
@@ -197,6 +225,7 @@ fun MenuScreen(
 
         Spacer(Modifier.height(20.dp))
 
+        // fila: quizzes + progreso/favoritos
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -238,7 +267,6 @@ fun MenuScreen(
         }
     }
 }
-
 
 @Composable
 private fun MenuCard(

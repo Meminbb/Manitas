@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -121,8 +122,6 @@ fun SessionScreen(nav: NavHostController) {
                     )
                 )
 
-
-                // Display the persistent error message if there's any
                 if (errorMessage.isNotEmpty()) {
                     Text(
                         text = errorMessage,
@@ -132,26 +131,42 @@ fun SessionScreen(nav: NavHostController) {
                     )
                 }
 
-                // Login button
                 Button(
                     onClick = {
-                        if (email.isNotEmpty() && password.isNotEmpty()) {
-                            signInWithEmail(email, password, auth, nav)
-                        } else {
+                        val trimmedEmail = email.trim()
+                        val trimmedPassword = password.trim()
+
+                        if (trimmedEmail.isEmpty() || trimmedPassword.isEmpty()) {
                             errorMessage = "Por favor ingrese correo y contraseña"
+                            return@Button
                         }
+
+                        auth.signInWithEmailAndPassword(trimmedEmail, trimmedPassword)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    val userId = auth.currentUser?.uid
+                                    if (userId != null) {
+                                        nav.navigate(ScreenNames.Menu.route + "/$userId") {
+                                            popUpTo(ScreenNames.LoginScreen.route) { inclusive = true }
+                                        }
+                                    }
+                                } else {
+                                    errorMessage = "Correo o contraseña incorrecta"
+                                }
+                            }
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp),
-                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFBAD1E1),
                         contentColor = Color.Black
                     )
                 ) {
-                    Text("Iniciar Sesión", fontSize = 18.sp)
+                    Text(
+                        text = "Iniciar sesión",
+                        fontWeight = FontWeight.Bold
+                    )
                 }
+
             }
         }
     }
