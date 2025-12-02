@@ -2,6 +2,8 @@ package com.example.manitas.screens.notificaciones
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -16,15 +18,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.manitas.model.Notificacion
-import kotlinx.coroutines.launch
 
 @Composable
 fun NotificacionesScreen(
     nav: NavHostController,
-    userType: String = "administrador" // cambiar a "administrador" para activar el botón
+    userType: String = "administrador"
 ) {
-    val scope = rememberCoroutineScope()
-
     var lista by remember { mutableStateOf<List<Notificacion>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
 
@@ -41,19 +40,14 @@ fun NotificacionesScreen(
     ) {
 
         // Top bar
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+
             IconButton(onClick = { nav.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Volver"
-                )
+                Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
             }
 
             Text(
-                text = "Notificaciones",
+                "Notificaciones",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1f)
@@ -61,30 +55,69 @@ fun NotificacionesScreen(
 
             if (userType == "administrador") {
                 IconButton(onClick = { nav.navigate("notificacionesAdd") }) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Agregar notificación",
-                        tint = Color.Black
-                    )
+                    Icon(Icons.Default.Add, contentDescription = "Agregar notificación")
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(Modifier.height(20.dp))
 
         if (loading) {
             Text("Cargando notificaciones...")
         } else {
-            lista.forEach { notif ->
-                NotificacionCard(notif)
-                Spacer(modifier = Modifier.height(12.dp))
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(lista) { notif ->
+                    NotificacionCard(notif)
+                }
             }
         }
     }
 }
 
+// -------------------------------------------------------------
+// TARJETA DE NOTIFICACIÓN (Final)
+// -------------------------------------------------------------
+
 @Composable
 fun NotificacionCard(n: Notificacion) {
+
+    // --- PARSE FECHA: VIENE COMO "10/12/2025" ---
+    val partes = n.date.split("/")
+    val dia = partes.getOrNull(0) ?: ""
+    val mesNum = partes.getOrNull(1)?.toIntOrNull() ?: 0
+
+    val meses = listOf(
+        "Ene","Feb","Mar","Abr","May","Jun",
+        "Jul","Ago","Sep","Oct","Nov","Dic"
+    )
+    val mesTexto = if (mesNum in 1..12) meses[mesNum - 1] else ""
+
+    // --- FORMATO DE HORA ---
+    fun formatoHora(hora: String?): String {
+        if (hora.isNullOrEmpty()) return ""
+
+        val partesHora = hora.split(":")
+        val h = partesHora.getOrNull(0)?.toIntOrNull() ?: return hora
+        val m = partesHora.getOrNull(1) ?: "00"
+
+        val suf = if (h < 12) "am" else "pm"
+        val h12 = if (h % 12 == 0) 12 else h % 12
+
+        return "$h12:$m$suf"
+    }
+
+    val horaInicioFmt = formatoHora(n.horaInicio)
+    val horaFinFmt = formatoHora(n.horaFin)
+
+    val horarioTexto =
+        if (horaInicioFmt.isNotEmpty() && horaFinFmt.isNotEmpty())
+            "$horaInicioFmt - $horaFinFmt"
+        else
+            ""
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -92,22 +125,30 @@ fun NotificacionCard(n: Notificacion) {
             .padding(16.dp)
     ) {
 
-        // Fecha
+        // --- FECHA IZQUIERDA ---
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.width(70.dp)
         ) {
-            val partes = n.date.split(" ")
-            Text(partes.getOrNull(0) ?: "", fontSize = 22.sp, fontWeight = FontWeight.Bold)
-            Text(partes.getOrNull(1) ?: "", fontSize = 14.sp, color = Color.Gray)
+            Text(dia, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Text(mesTexto, fontSize = 14.sp, color = Color.Gray)
         }
 
         Spacer(Modifier.width(16.dp))
 
+        // --- CONTENIDO DERECHA ---
         Column {
             Text(n.title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Text(n.message, fontSize = 14.sp)
-            Text("Horario pendiente", fontSize = 12.sp, color = Color.Gray)
+
+            if (horarioTexto.isNotEmpty()) {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    horarioTexto,
+                    fontSize = 14.sp,
+                    color = Color(0xFF4A4A4A)
+                )
+            }
         }
     }
 }

@@ -3,12 +3,13 @@ package com.example.manitas.screens.notificaciones
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,13 +39,12 @@ fun NotificacionesAddScreen(nav: NavHostController) {
     var horaInicio by remember { mutableStateOf("") }
     var horaFin by remember { mutableStateOf("") }
 
-    // Fecha picker
     fun openDatePicker() {
         val cal = Calendar.getInstance()
         DatePickerDialog(
             ctx,
             { _, year, month, day ->
-                fecha = "$day/${month + 1}/$year"
+                fecha = String.format("%02d/%02d/%04d", day, month + 1, year)
             },
             cal.get(Calendar.YEAR),
             cal.get(Calendar.MONTH),
@@ -52,18 +52,17 @@ fun NotificacionesAddScreen(nav: NavHostController) {
         ).show()
     }
 
-    // Hora picker
     fun openTimePicker(onTimeSelected: (String) -> Unit) {
         val cal = Calendar.getInstance()
         TimePickerDialog(
             ctx,
             { _, hour, minute ->
-                val formatted = String.format("%02d:%02d", hour, minute)
-                onTimeSelected(formatted)
+                val time = String.format("%02d:%02d", hour, minute)
+                onTimeSelected(time)
             },
             cal.get(Calendar.HOUR_OF_DAY),
             cal.get(Calendar.MINUTE),
-            false
+            true
         ).show()
     }
 
@@ -74,7 +73,6 @@ fun NotificacionesAddScreen(nav: NavHostController) {
             .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
 
-        // Top bar
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { nav.popBackStack() }) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
@@ -90,7 +88,6 @@ fun NotificacionesAddScreen(nav: NavHostController) {
 
         Spacer(Modifier.height(20.dp))
 
-        // Tarjeta azul clara
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -98,7 +95,6 @@ fun NotificacionesAddScreen(nav: NavHostController) {
                 .padding(20.dp)
         ) {
 
-            // Campo título
             OutlinedTextField(
                 value = titulo,
                 onValueChange = { titulo = it },
@@ -109,7 +105,6 @@ fun NotificacionesAddScreen(nav: NavHostController) {
 
             Spacer(Modifier.height(16.dp))
 
-            // Campo descripción
             OutlinedTextField(
                 value = descripcion,
                 onValueChange = { descripcion = it },
@@ -120,7 +115,6 @@ fun NotificacionesAddScreen(nav: NavHostController) {
 
             Spacer(Modifier.height(16.dp))
 
-            // Checkbox agregar fecha
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
                     checked = agregarFecha,
@@ -129,57 +123,62 @@ fun NotificacionesAddScreen(nav: NavHostController) {
                 Text("Agregar fecha")
             }
 
-            // Si el admin decide agregar fecha → aparecen los componentes
             if (agregarFecha) {
 
                 Spacer(Modifier.height(10.dp))
 
-                // Fecha
                 OutlinedTextField(
                     value = fecha,
                     onValueChange = {},
-                    label = { Text("Fecha") },
                     readOnly = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { openDatePicker() },
-                    shape = RoundedCornerShape(12.dp)
+                    label = { Text("Fecha") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    trailingIcon = {
+                        IconButton(onClick = { openDatePicker() }) {
+                            Icon(Icons.Default.DateRange, contentDescription = "Seleccionar fecha")
+                        }
+                    }
                 )
 
                 Spacer(Modifier.height(12.dp))
 
-                // Horas
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+
                     OutlinedTextField(
                         value = horaInicio,
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Hora inicio") },
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { openTimePicker { horaInicio = it } },
-                        shape = RoundedCornerShape(12.dp)
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        trailingIcon = {
+                            IconButton(onClick = { openTimePicker { horaInicio = it } }) {
+                                Icon(Icons.Default.AccessTime, contentDescription = "Hora inicio")
+                            }
+                        }
                     )
+
                     Spacer(Modifier.width(12.dp))
+
                     OutlinedTextField(
                         value = horaFin,
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Hora fin") },
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { openTimePicker { horaFin = it } },
-                        shape = RoundedCornerShape(12.dp)
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        trailingIcon = {
+                            IconButton(onClick = { openTimePicker { horaFin = it } }) {
+                                Icon(Icons.Default.AccessTime, contentDescription = "Hora fin")
+                            }
+                        }
                     )
                 }
             }
 
             Spacer(Modifier.height(20.dp))
 
-            // Botón enviar
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.CenterEnd
@@ -188,16 +187,17 @@ fun NotificacionesAddScreen(nav: NavHostController) {
                     onClick = {
                         scope.launch {
 
-                            val fechaTexto = if (agregarFecha) {
-                                "$fecha - $horaInicio a $horaFin"
-                            } else {
-                                ""
-                            }
+                            val fechaTexto =
+                                if (!agregarFecha || fecha.isBlank()) ""
+                                else fecha  // 👉 YA NO UNE HORAS AQUÍ
 
+                            // ✅ ESTA ES LA CORRECCIÓN PRINCIPAL:
                             NotificacionesRepository.addNotificacion(
                                 title = titulo,
                                 message = descripcion,
-                                date = fechaTexto
+                                date = fechaTexto,
+                                horaInicio = horaInicio,
+                                horaFin = horaFin
                             )
 
                             nav.popBackStack()
@@ -207,11 +207,7 @@ fun NotificacionesAddScreen(nav: NavHostController) {
                         .size(52.dp)
                         .background(Color(0xFFC7D7E6), RoundedCornerShape(50))
                 ) {
-                    Icon(
-                        Icons.Default.Send,
-                        contentDescription = "Enviar",
-                        tint = Color.Black
-                    )
+                    Icon(Icons.Default.Send, contentDescription = "Enviar", tint = Color.Black)
                 }
             }
         }

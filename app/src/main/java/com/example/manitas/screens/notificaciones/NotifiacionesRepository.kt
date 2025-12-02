@@ -1,7 +1,6 @@
 package com.example.manitas.screens.notificaciones
 
 import com.example.manitas.model.Notificacion
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -9,20 +8,24 @@ object NotificacionesRepository {
 
     private val db = FirebaseFirestore.getInstance()
 
-    // Obtener notificaciones ordenadas por fecha de creación
+    // 🔹 Obtener notificaciones con fecha y horas
     suspend fun getNotificaciones(): List<Notificacion> {
         return try {
-            val snapshot = db.collection("notifications")
-                .orderBy("createdAt")
+            val snapshot = db.collection("notificaciones")
+                .orderBy("date")
                 .get()
                 .await()
 
-            snapshot.documents.map { doc ->
+            snapshot.documents.mapNotNull { doc ->
+                val data = doc.data ?: return@mapNotNull null
+
                 Notificacion(
                     id = doc.id,
-                    title = doc.getString("title") ?: "",
-                    message = doc.getString("message") ?: "",
-                    date = doc.getString("date") ?: ""
+                    title = data["title"] as? String ?: "",
+                    message = data["message"] as? String ?: "",
+                    date = data["date"] as? String ?: "",
+                    horaInicio = data["horaInicio"] as? String,
+                    horaFin = data["horaFin"] as? String
                 )
             }
 
@@ -31,16 +34,23 @@ object NotificacionesRepository {
         }
     }
 
-    // Agregar nueva notificación
-    suspend fun addNotificacion(title: String, message: String, date: String) {
-        val data = hashMapOf(
+    // 🔹 Agregar notificación completa
+    suspend fun addNotificacion(
+        title: String,
+        message: String,
+        date: String,
+        horaInicio: String?,
+        horaFin: String?
+    ) {
+        val data = mapOf(
             "title" to title,
             "message" to message,
             "date" to date,
-            "createdAt" to Timestamp.now()
+            "horaInicio" to (horaInicio ?: ""),
+            "horaFin" to (horaFin ?: "")
         )
 
-        db.collection("notifications")
+        db.collection("notificaciones")
             .add(data)
             .await()
     }
