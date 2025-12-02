@@ -15,16 +15,15 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,205 +39,194 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import com.example.manitas.model.getVideos
 import com.example.manitas.navigation.ScreenNames
 
 
 
-@Composable
-fun getImageFromRaw(resourceName: String): Bitmap? {
-    val resourceId = LocalContext.current.resources.getIdentifier(resourceName, "raw", LocalContext.current.packageName)
-    if (resourceId == 0) return null
-
-    val inputStream = LocalContext.current.resources.openRawResource(resourceId)
-    return BitmapFactory.decodeStream(inputStream)
-}
-
-
-@Composable
-fun getVideoUriFromRaw(resourceName: String): Uri {
-    val resourceId = LocalContext.current.resources.getIdentifier(resourceName, "raw", LocalContext.current.packageName)
-    return Uri.parse("android.resource://${LocalContext.current.packageName}/$resourceId")
-}
-
-fun getRawResourceFiles(): List<String> {
-    return listOf(
-        "frutas_banana", "frutas_manzana", "frutas_naranja",
-        "letras_a", "letras_b", "letras_c", "letras_o"
-    )
-}
 
 @Composable
 fun MenuScreen(
     onNavigate: (String) -> Unit,
     userName: String = "Karla"
 ) {
+    val videos = getVideos()
+    val sendas = videos.map { it.name }
+
     var query by remember { mutableStateOf("") }
 
-    val sendas = getRawResourceFiles()
+    val filteredSendas =
+        if (query.isNotBlank()) sendas.filter { it.contains(query, ignoreCase = true) }
+        else emptyList()
 
-    val filteredSendas = if (query.isNotEmpty()) {
-        sendas.filter { it.contains(query, ignoreCase = true) }
-    } else {
-        emptyList()
-    }
-
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Text(
-            text = "Hola, $userName",
-            fontSize = 50.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 30.dp)
-                .padding(top = 60.dp),
-            textAlign = TextAlign.Center
-        )
 
-        Row(
+        // MENÚ
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Box(
+            Text(
+                text = "Hola, $userName",
+                fontSize = 50.sp,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .size(50.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(Color(0xFFDBE7EE))
-                    .clickable { onNavigate(ScreenNames.Notificaciones.route) }
-                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .padding(bottom = 30.dp)
+                    .padding(top = 60.dp),
+                textAlign = TextAlign.Center
+            )
+
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = "Notificaciones",
-                    tint = Color.Black,
-                    modifier = Modifier.fillMaxSize()
+                Box(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(Color(0xFFDBE7EE))
+                        .clickable { onNavigate(ScreenNames.Notificaciones.route) }
+                        .padding(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = "Notificaciones",
+                        tint = Color.Black,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                TextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    placeholder = { Text("Buscar...") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(24.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color(0xFFDBE7EE),
+                        unfocusedContainerColor = Color(0xFFDBE7EE),
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    modifier = Modifier.weight(1f)
                 )
             }
 
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(Modifier.height(10.dp))
 
-            TextField(
-                value = query,
-                onValueChange = { query = it },
-                placeholder = { Text("Buscar...") },
-                shape = RoundedCornerShape(24.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFDBE7EE),
-                    unfocusedContainerColor = Color(0xFFDBE7EE),
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                modifier = Modifier.weight(1f)
+            MenuCard(
+                title = "Diccionario de señas",
+                containerColor = Color(0xFFEDF3F7),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp),
+                onClick = { onNavigate(ScreenNames.Categorias.route) }
             )
-        }
 
-        Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(20.dp))
 
-        if (query.isNotEmpty()) {
-            if (filteredSendas.isEmpty()) {
-                Text(
-                    text = "No se encontraron resultados",
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(16.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                MenuCard(
+                    title = "Quizzes",
+                    containerColor = Color(0xFFBED2E0),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(290.dp),
+                    onClick = { onNavigate(ScreenNames.Quiz.route) }
                 )
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(filteredSendas) { seña ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                                .clickable {
-                                    onNavigate(ScreenNames.SeñaDetail.createRoute(seña))
-                                }
-                        ) {
-                            val image = getImageFromRaw(seña)
-                            image?.let {
-                                Image(bitmap = it.asImageBitmap(), contentDescription = seña)
-                            }
+                    MenuCard(
+                        title = "Progreso",
+                        containerColor = Color(0xFFDBE7EE),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(137.dp),
+                        onClick = { onNavigate(ScreenNames.Progreso.route) }
+                    )
 
-                            Spacer(modifier = Modifier.width(10.dp))
-
-                            Text(
-                                text = seña,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color(0xFF1A1A1A),
-                                modifier = Modifier.align(Alignment.CenterVertically)
-                            )
-                        }
-                    }
+                    MenuCard(
+                        title = "Favoritos",
+                        containerColor = Color(0xFFBED2E0),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(137.dp),
+                        leading = { Icon(Icons.Default.Favorite, null) },
+                        onClick = { onNavigate(ScreenNames.Favoritos.route) }
+                    )
                 }
             }
         }
 
-        MenuCard(
-            title = "Diccionario de señas",
-            containerColor = Color(0xFFEDF3F7),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(180.dp),
-            onClick = { onNavigate(ScreenNames.Categorias.route) }
-        )
-
-        Spacer(Modifier.height(20.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            MenuCard(
-                title = "Quizzes",
-                containerColor = Color(0xFFBED2E0),
-                modifier = Modifier
-                    .weight(1f)
-                    .height(290.dp),
-                onClick = { onNavigate(ScreenNames.Quiz.route) }
-            )
-
+        if (query.isNotBlank() && filteredSendas.isNotEmpty()) {
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .zIndex(1f)
+                    .align(Alignment.TopStart)
+                    .padding(
+                        start = 16.dp + 50.dp + 10.dp,
+                        end = 16.dp
+                    )
+                    .offset(
+                        y = 16.dp + 60.dp + 50.dp + 30.dp + 10.dp + 56.dp
+                    )
+                    .fillMaxWidth()
+                    .heightIn(max = 200.dp)
+                    .shadow(6.dp, RoundedCornerShape(18.dp))
+                    .background(
+                        color = Color(0xFFDBE7EE),
+                        shape = RoundedCornerShape(18.dp)
+                    )
             ) {
-                MenuCard(
-                    title = "Progreso",
-                    containerColor = Color(0xFFDBE7EE),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(137.dp),
-                    onClick = { onNavigate(ScreenNames.Progreso.route) }
-                )
-
-                MenuCard(
-                    title = "Favoritos",
-                    containerColor = Color(0xFFBED2E0),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(137.dp),
-                    leading = { Icon(Icons.Default.Favorite, null) },
-                    onClick = { onNavigate(ScreenNames.Favoritos.route) }
-                )
+                filteredSendas.forEach { seña ->
+                    Text(
+                        text = seña,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF1A1A1A),
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                val video = videos.firstOrNull { it.name == seña }
+                                if (video != null) {
+                                    onNavigate(
+                                        ScreenNames.VideosporCat.createRoute(video.catId, video.id)
+                                    )
+                                }
+                            }
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
             }
         }
     }
 }
-
 
 @Composable
 private fun MenuCard(
