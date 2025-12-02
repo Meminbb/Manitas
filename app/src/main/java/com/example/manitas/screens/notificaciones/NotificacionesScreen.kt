@@ -12,135 +12,102 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.example.manitas.navigation.ScreenNames
+import com.example.manitas.model.Notificacion
+import kotlinx.coroutines.launch
 
 @Composable
-fun NotificacionesScreen(nav: NavHostController) {
+fun NotificacionesScreen(
+    nav: NavHostController,
+    userType: String = "administrador" // cambiar a "administrador" para activar el botón
+) {
+    val scope = rememberCoroutineScope()
 
-    val userType = "admin"   // ← Cambiar a "usuario" para ocultar el "+"
+    var lista by remember { mutableStateOf<List<Notificacion>>(emptyList()) }
+    var loading by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        lista = NotificacionesRepository.getNotificaciones()
+        loading = false
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.White)
             .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
 
-        // -------- TOP BAR --------
+        // Top bar
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 24.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
             IconButton(onClick = { nav.popBackStack() }) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Volver"
+                )
             }
-
-            Spacer(Modifier.width(8.dp))
 
             Text(
                 text = "Notificaciones",
                 fontSize = 32.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f)
             )
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            // ---- SOLO ADMIN TIENE EL BOTÓN + ----
-            if (userType == "admin") {
-                IconButton(
-                    onClick = { nav.navigate(ScreenNames.NotificacionesAdd.route) }
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Agregar")
+            if (userType == "administrador") {
+                IconButton(onClick = { nav.navigate("notificacionesAdd") }) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Agregar notificación",
+                        tint = Color.Black
+                    )
                 }
             }
         }
 
-        // -------- LISTA DE NOTIFICACIONES HARDCODEADAS --------
-        NotificacionCard(
-            dia = "09",
-            mes = "OCT",
-            titulo = "Taller LSM",
-            lugar = "Aulas 4 Salón 402",
-            hora = "6:00 pm – 7:30 pm"
-        )
+        Spacer(modifier = Modifier.height(20.dp))
 
-        Spacer(Modifier.height(12.dp))
-
-        NotificacionCard(
-            dia = "15",
-            mes = "OCT",
-            titulo = "Clase 1",
-            lugar = "Aulas 4 Salón 402",
-            hora = "6:00 pm – 7:30 pm"
-        )
-
-        Spacer(Modifier.height(12.dp))
-
-        NotificacionCard(
-            dia = "20",
-            mes = "OCT",
-            titulo = "Clase 2",
-            lugar = "Aulas 4 Salón 402",
-            hora = "6:00 pm – 7:30 pm"
-        )
-
-        Spacer(Modifier.height(12.dp))
-
-        InfoCard(
-            titulo = "¡Videos nuevos!",
-            descripcion = "Se agregaron videos a la categoría “Números”.\nEmpieza a verlos ahora."
-        )
+        if (loading) {
+            Text("Cargando notificaciones...")
+        } else {
+            lista.forEach { notif ->
+                NotificacionCard(notif)
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        }
     }
 }
 
 @Composable
-fun NotificacionCard(dia: String, mes: String, titulo: String, lugar: String, hora: String) {
+fun NotificacionCard(n: Notificacion) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFE3F2FD), RoundedCornerShape(12.dp))
+            .background(Color(0xFFE5F2FF), RoundedCornerShape(16.dp))
             .padding(16.dp)
     ) {
 
         // Fecha
         Column(
-            modifier = Modifier
-                .width(55.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.width(70.dp)
         ) {
-            Text(dia, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            Text(mes, fontSize = 18.sp, fontWeight = FontWeight.Medium)
+            val partes = n.date.split(" ")
+            Text(partes.getOrNull(0) ?: "", fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Text(partes.getOrNull(1) ?: "", fontSize = 14.sp, color = Color.Gray)
         }
 
         Spacer(Modifier.width(16.dp))
 
         Column {
-            Text(titulo, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Text(lugar, fontSize = 14.sp)
-            Text(hora, fontSize = 14.sp)
+            Text(n.title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(n.message, fontSize = 14.sp)
+            Text("Horario pendiente", fontSize = 12.sp, color = Color.Gray)
         }
     }
-}
-
-@Composable
-fun InfoCard(titulo: String, descripcion: String) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFFE3F2FD), RoundedCornerShape(12.dp))
-            .padding(16.dp)
-    ) {
-        Text(titulo, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        Text(descripcion, fontSize = 14.sp)
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewNotificacionesScreen() {
-    NotificacionesScreen(rememberNavController())
 }
