@@ -2,9 +2,12 @@ package com.example.manitas.navigation
 
 sealed class ScreenNames (val route: String) {
     data object Categorias: ScreenNames("categorias")
-    data object VideosporCat: ScreenNames("videosporcat/{id}") {
-        fun createRoute(id: Int) = "videosporcat/$id"
+    data object VideosporCat : ScreenNames("videosporcat/{id}?selectedId={selectedId}") {
+        fun createRoute(id: Int, selectedId: Int = -1): String {
+            return "videosporcat/$id?selectedId=$selectedId"
+        }
     }
+
     data object NotificacionesAdd: ScreenNames("notificaciones_add")
 
     data object LoginScreen: ScreenNames("login")
@@ -21,7 +24,5 @@ sealed class ScreenNames (val route: String) {
         fun createRoute(id: Int) = "favoritoDetalle/$id"
     }
     data object Quiz : ScreenNames("quiz")
-    data object SeñaDetail : ScreenNames("seña_detail/{id}") {
-        fun createRoute(id: String) = "seña_detail/$id"
-    }
+
 }

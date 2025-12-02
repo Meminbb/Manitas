@@ -16,7 +16,8 @@ class Video(
     val name: String,
     val resId: Int,
     val type: MediaType,
-    fav: Boolean
+    fav: Boolean,
+
 ){
     var fav by mutableStateOf(fav)
 }
