@@ -54,6 +54,9 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                 }
             )
         }
+        composable("notificacionesAdd") {
+            NotificacionesAddScreen(nav = nav)
+        }
 
 
         composable(ScreenNames.Progreso.route) {
