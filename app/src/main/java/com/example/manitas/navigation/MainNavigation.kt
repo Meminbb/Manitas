@@ -12,7 +12,6 @@ import com.example.manitas.model.getCategories
 import com.example.manitas.model.getVideos
 import com.example.manitas.screens.CategoriesScreen
 import com.example.manitas.screens.VideosporCatScreen
-import com.example.manitas.screens.favoritos.FavoritosScreen
 import com.example.manitas.screens.favoritos.VideosFavoritosScreen
 import com.example.manitas.screens.login.LoginScreen
 import com.example.manitas.screens.login.LoginUserScreen
@@ -21,6 +20,7 @@ import com.example.manitas.screens.login.CreateUserScreen
 import com.example.manitas.screens.progreso.ProgresoScreen
 import com.example.manitas.screens.notificaciones.NotificacionesScreen
 import com.example.manitas.screens.notificaciones.NotificacionesAddScreen
+import com.example.manitas.screens.quiz.QuizCategoriesScreen
 import com.example.manitas.screens.quiz.QuizScreen
 
 
@@ -39,6 +39,7 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                 onNavigate = { route -> nav.navigate(route) }
             )
         }
+
         composable(ScreenNames.NotificacionesAdd.route) {
             NotificacionesAddScreen(nav = nav)
         }
@@ -54,6 +55,13 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                 }
             )
         }
+        composable("notificacionesAdd") {
+            NotificacionesAddScreen(nav = nav)
+        }
+
+        composable("Favoritos"){
+            VideosFavoritosScreen(nav = nav)
+        }
 
 
         composable(ScreenNames.Progreso.route) {
@@ -64,11 +72,7 @@ fun MainNavigation(modifier: Modifier = Modifier) {
             NotificacionesScreen(nav = nav)
         }
 
-        composable(ScreenNames.Favoritos.route) {
-            FavoritosScreen(nav = nav)
-        }
 
-        // ---------------------Kevin-------------------------
         composable(ScreenNames.LoginScreen.route) {
             LoginScreen(nav = nav)
         }
@@ -80,19 +84,6 @@ fun MainNavigation(modifier: Modifier = Modifier) {
         }
         composable(ScreenNames.CreateUserScreen.route){
             CreateUserScreen(nav = nav)
-        }
-
-        composable(
-            route = ScreenNames.FavoritoDetalle.route,
-            arguments = listOf(
-                navArgument("id") { type = NavType.IntType }
-            )
-        ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getInt("id") ?: 0
-            VideosFavoritosScreen(
-                nav = nav,
-                favoritoId = id
-            )
         }
 
 
@@ -111,10 +102,44 @@ fun MainNavigation(modifier: Modifier = Modifier) {
             )
         }
 
-        composable(ScreenNames.Quiz.route) {
-            QuizScreen()
+
+
+
+        composable(ScreenNames.QuizList.route) {
+            val categories = getCategories()
+            QuizCategoriesScreen(
+                categories = categories,
+                nav = nav,
+                onItemClick = { category ->
+                    nav.navigate(ScreenNames.QuizQuestionbyCat.createRoute(category.id))
+                }
+            )
         }
 
+        composable(
+            route = ScreenNames.VideosporCat.route,
+            arguments = listOf(
+                navArgument("id") { type = NavType.IntType },
+                navArgument("selectedId") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: 0
+            val selectedId = backStackEntry.arguments?.getInt("selectedId") ?: -1
 
+            val videos = getVideos().filter { it.catId == id }
+
+            VideosporCatScreen(
+                idCategory = id,
+                videos = videos,
+                nav = nav,
+                selectedVideoId = if (selectedId != -1) selectedId else null
+            )
+        }
     }
 }
+
+
+

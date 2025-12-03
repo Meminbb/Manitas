@@ -1,23 +1,12 @@
 package com.example.manitas.screens.login
 
-import androidx.compose.foundation.BorderStroke
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,23 +14,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.manitas.R
+import com.example.manitas.datastore.UserDataStore
+import com.example.manitas.navigation.ScreenNames
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun SessionScreen(nav: NavHostController) {
     val bgColor = Color(194, 216, 229)
+    val auth = FirebaseAuth.getInstance()
+
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(bgColor)
     ) {
-
         Row(
             modifier = Modifier
                 .weight(0.75f)
@@ -50,8 +48,6 @@ fun SessionScreen(nav: NavHostController) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -59,15 +55,12 @@ fun SessionScreen(nav: NavHostController) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 Image(
                     painter = painterResource(id = R.drawable.logo),
                     contentDescription = "App Logo",
                     modifier = Modifier.size(120.dp)
                 )
-
                 val titleFont = FontFamily(Font(R.font.manitas_font))
-
                 Text(
                     text = "MANITAS",
                     fontSize = 55.sp,
@@ -77,18 +70,11 @@ fun SessionScreen(nav: NavHostController) {
             }
         }
 
-
-
         Column(
             modifier = Modifier
                 .weight(1.25f)
                 .fillMaxWidth()
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 32.dp,
-                        topEnd = 32.dp
-                    )
-                )
+                .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
                 .background(Color.White)
                 .padding(horizontal = 32.dp, vertical = 60.dp),
             verticalArrangement = Arrangement.Top,
@@ -107,47 +93,102 @@ fun SessionScreen(nav: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = email,
+                    onValueChange = { email = it.replace(" ","").lowercase() },
                     label = { Text("Correo") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    )
                 )
 
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = password,
+                    onValueChange = { password = it.replace(" ", "") },
                     label = { Text("Contraseña") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    )
                 )
 
-                Button(
-                    onClick = { nav.navigate("menu") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFBAD1E1),
-                        contentColor = Color.Black
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(top = 8.dp)
                     )
-                ) {
-                    Text("Iniciar Sesión", fontSize = 18.sp)
                 }
+
+                Button(
+                    onClick = {
+                        val trimmedEmail = email.trim()
+                        val trimmedPassword = password.trim()
+
+                        if (trimmedEmail.isEmpty() || trimmedPassword.isEmpty()) {
+                            errorMessage = "Por favor ingrese correo y contraseña"
+                            return@Button
+                        }
+
+                        auth.signInWithEmailAndPassword(trimmedEmail, trimmedPassword)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+
+                                    val userId = auth.currentUser?.uid
+                                    if (userId != null) {
+                                        val context = nav.context
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            UserDataStore.saveUserId(context, userId)
+                                        }
+                                    }
+
+                                    nav.navigate(ScreenNames.Menu.route) {
+                                        popUpTo(ScreenNames.LoginScreen.route) { inclusive = true }
+                                    }
+
+                                } else {
+                                    errorMessage = "Correo o contraseña incorrecta"
+                                }
+                            }
+                    }
+                ) {
+                    Text("Iniciar sesión",
+                        fontWeight = FontWeight.Bold)
+                }
+
+
             }
         }
     }
 }
 
+fun signInWithEmail(email: String, password: String, auth: FirebaseAuth, nav: NavHostController) {
+    auth.signInWithEmailAndPassword(email, password)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val user = auth.currentUser
+                val userId = user?.uid
 
-@Preview(showBackground = true)
-@Composable
-fun SessionScreenPreview() {
-    val nav = rememberNavController()
-    SessionScreen(nav)
+                if (userId != null) {
+                    nav.navigate("${ScreenNames.Menu.route}/$userId")
+                }
+            } else {
+                val errorMessage = task.exception?.message
+                errorMessage?.let { error ->
+                    Toast.makeText(nav.context, error, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
 }

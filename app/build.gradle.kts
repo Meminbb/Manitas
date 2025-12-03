@@ -46,8 +46,12 @@ android {
 
 dependencies {
     // Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
-    implementation("com.google.firebase:firebase-analytics")
+    implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
+
+    // Usa las dependencias SIN versión
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+
 
     // AndroidX + Compose
     implementation(libs.androidx.core.ktx)
@@ -60,6 +64,13 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui.text)
     implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.compose.foundation)
+    implementation("androidx.datastore:datastore-preferences:1.2.0")
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.ui.unit)
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.ui)
 
     // Tests
     testImplementation(libs.junit)

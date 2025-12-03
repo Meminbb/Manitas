@@ -36,6 +36,9 @@ import com.example.manitas.model.enableQuiz
 import com.example.manitas.model.getCategories
 import com.example.manitas.model.getNamebyId
 import com.example.manitas.model.getVideos
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 //buscar como get el nombre de la categoria y como modificar true y false el quiz available
@@ -44,12 +47,40 @@ import com.example.manitas.model.getVideos
 fun VideosporCatScreen(
     idCategory: Int,
     videos: List<Video>,
-    nav: NavHostController? = null
+    nav: NavHostController? = null,
+    selectedVideoId: Int? = null
 ) {
-    var index by remember { mutableStateOf(0) } //index del video
-    val current = videos[index] //current video
-    val categoryName = getNamebyId(idCategory, getCategories())
 
+    val initialIndex = remember(videos, selectedVideoId) {
+        selectedVideoId?.let { id ->
+            val idx = videos.indexOfFirst { it.id == id }
+            if (idx >= 0) idx else 0
+        } ?: 0
+    }
+
+    var index by remember(videos, selectedVideoId) { mutableStateOf(initialIndex) }
+    val current = videos[index]
+
+    val auth = FirebaseAuth.getInstance()
+    val userId = auth.currentUser?.uid
+
+    val db = FirebaseFirestore.getInstance()
+
+    var favSet by remember { mutableStateOf<Set<Int>>(emptySet()) }
+
+    LaunchedEffect(userId) {
+        if (userId.isNullOrEmpty()) return@LaunchedEffect
+
+        db.collection("users")
+            .document(userId)
+            .get()
+            .addOnSuccessListener { doc ->
+                val list = doc.get("Fav") as? List<Number>
+                favSet = list?.map { it.toInt() }?.toSet() ?: emptySet()
+            }
+    }
+
+    val isCurrentFav = favSet.contains(current.id)
 
     Column(
         modifier = Modifier
@@ -77,8 +108,6 @@ fun VideosporCatScreen(
             )
         }
 
-        //lazy row
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -97,6 +126,7 @@ fun VideosporCatScreen(
                     )
                 }
             }
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth(0.75f)
@@ -169,7 +199,7 @@ fun VideosporCatScreen(
                     imageVector = if (index < videos.lastIndex)
                         Icons.Default.KeyboardArrowRight
                     else
-                        Icons.Default.Check, // icono de completado
+                        Icons.Default.Check,
                     contentDescription = "Siguiente"
                 )
 
@@ -191,23 +221,31 @@ fun VideosporCatScreen(
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Medium
                 )
-                Text(
-                    text = "ResID: ${current.resId}",
-                    fontSize = 15.sp,
-                    color = Color.Gray
-                )
             }
+            if (!userId.isNullOrEmpty()) {
+                IconButton(
+                    onClick = {
+                        val docRef = db.collection("users").document(userId)
 
-            IconButton(onClick = { current.fav = !current.fav }) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "Fav",
-                    tint = if (current.fav) Color.Red else Color.Gray,
-                    modifier = Modifier.size(28.dp)
-                )
+                        if (favSet.contains(current.id)) {
+
+                            favSet = favSet - current.id
+                            docRef.update("Fav", FieldValue.arrayRemove(current.id))
+                        } else {
+                            favSet = favSet + current.id
+                            docRef.update("Fav", FieldValue.arrayUnion(current.id))
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "Fav",
+                        tint = if (isCurrentFav) Color.Red else Color.Gray,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
             }
         }
-
     }
 }
 

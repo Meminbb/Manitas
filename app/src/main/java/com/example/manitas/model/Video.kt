@@ -16,17 +16,14 @@ class Video(
     val name: String,
     val resId: Int,
     val type: MediaType,
-    fav: Boolean
-){
-    var fav by mutableStateOf(fav)
-}
+)
 
 fun getVideos(): List<Video> = listOf(
-    Video(1, 1, "Manzana", R.raw.frutas_manzana, MediaType.VIDEO, false),
-    Video(2, 1, "Naranja", R.raw.frutas_naranja, MediaType.VIDEO, false),
-    Video(3, 1, "Banano", R.raw.frutas_banano, MediaType.VIDEO, false),
+    Video(1, 1, "Manzana", R.raw.frutas_manzana, MediaType.VIDEO),
+    Video(2, 1, "Naranja", R.raw.frutas_naranja, MediaType.VIDEO),
+    Video(3, 1, "Banano", R.raw.frutas_banano, MediaType.VIDEO),
 
-    Video(4, 2, "A", R.raw.letras_a, MediaType.IMAGE, false),
-    Video(5, 2, "B", R.raw.letras_b, MediaType.IMAGE, false),
-    Video(6, 2, "C", R.raw.letras_c, MediaType.IMAGE, false),
+    Video(4, 2, "A", R.raw.letras_a, MediaType.IMAGE),
+    Video(5, 2, "B", R.raw.letras_b, MediaType.IMAGE),
+    Video(6, 2, "C", R.raw.letras_c, MediaType.IMAGE),
 )
