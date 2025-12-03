@@ -11,10 +11,13 @@ class Category (
     val name: String,
     val icon: String,
     @DrawableRes val img: Int,
-    quizAvailable: Boolean
+    quizAvailable: Boolean,
+    score : Int = 0
 ){
     var quizAvailable by mutableStateOf(quizAvailable)
+    var score by mutableStateOf(score)
 }
+
 
 fun getCategories(): List<Category> = listOf(
     Category(1,"Frutas", "🍎", R.drawable.frutas, false),
