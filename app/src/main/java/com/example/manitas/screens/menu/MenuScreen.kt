@@ -77,7 +77,6 @@ fun MenuScreen(
 ) {
     val context = LocalContext.current
 
-
     val userIdFlow = UserDataStore.getUserId(context)
     val userId by userIdFlow.collectAsState(initial = null)
 
@@ -242,8 +241,15 @@ fun MenuScreen(
             Column(
                 modifier = Modifier
                     .zIndex(1f)
-                    .align(Alignment.TopCenter)
-                    .padding(top = 130.dp, start = 16.dp, end = 16.dp)
+                    .align(Alignment.TopStart)
+                    .padding(
+                        start = 16.dp + 50.dp + 10.dp,
+                        end = 16.dp
+                    )
+                    .offset(
+
+                        y = 16.dp + 40.dp + 50.dp + 30.dp + 10.dp + 56.dp
+                    )
                     .fillMaxWidth()
                     .heightIn(max = 200.dp)
                     .shadow(6.dp, RoundedCornerShape(18.dp))
