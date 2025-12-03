@@ -11,7 +11,7 @@ data class QuizQuestion(
     val correctAnswer: Int
 )
 
-fun getQuizQuestionsbyCat(): List<QuizQuestion> = listOf(
+fun getQuizQuestionsbyCat(categoryId: Int): List<QuizQuestion> = listOf(
     QuizQuestion(
         id = 1,
         categoryId = 1,
@@ -25,7 +25,7 @@ fun getQuizQuestionsbyCat(): List<QuizQuestion> = listOf(
         id = 2,
         categoryId = 1,
         name = "Naranja",
-        mediaId = 2,
+        mediaId = R.raw.frutas_naranja,
         questionText = "¿Cuál es esta fruta?",
         answerOptions = listOf("Manzana", "Naranja", "Banano", "Piña"),
         correctAnswer = 1
@@ -34,9 +34,19 @@ fun getQuizQuestionsbyCat(): List<QuizQuestion> = listOf(
         id = 3,
         categoryId = 1,
         name = "Banano",
-        mediaId = 3,
+        mediaId = R.raw.frutas_banano,
         questionText = "¿Cuál es esta fruta?",
         answerOptions = listOf("Manzana", "Naranja", "Banano" , "Piña"),
         correctAnswer = 2
+    ),
+    QuizQuestion(
+        id = 4,
+        categoryId = 1,
+        name = "Test",
+        mediaId = R.raw.frutas_banano,
+        questionText = "¿Cuál es esta fruta?",
+        answerOptions = listOf("Manzana", "Test", "Banano" , "Piña"),
+        correctAnswer = 2
     )
-)
+
+).filter { it.categoryId == categoryId }
