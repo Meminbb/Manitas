@@ -67,6 +67,10 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.compose.foundation)
     implementation("androidx.datastore:datastore-preferences:1.2.0")
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.ui.unit)
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.ui)
 
     // Tests
     testImplementation(libs.junit)

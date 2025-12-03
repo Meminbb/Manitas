@@ -1,16 +1,33 @@
 package com.example.manitas.model
 
+import androidx.annotation.DrawableRes
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.example.manitas.R
+
 class Category (
     val id: Int,
     val name: String,
     val icon: String,
-    val img: String,
-)
+    @DrawableRes val img: Int,
+    quizAvailable: Boolean
+){
+    var quizAvailable by mutableStateOf(quizAvailable)
+}
 
 fun getCategories(): List<Category> = listOf(
-    Category(1,"Frutas", "🍎", "Foto de fruta"),
-    Category(2,"Abecedario","🔤","Foto de abecedario"),
-    Category(3,"Colores","🎨","Foto de colores"),
-    Category(4,"Animales", "🐶","Foto de animales")
+    Category(1,"Frutas", "🍎", R.drawable.frutas, false),
+    Category(2,"Abecedario","🔤",R.drawable.abc, false),
+    Category(3,"Colores","🎨",R.drawable.colores, false),
+    Category(4,"Animales", "🐶",R.drawable.animales, false)
 
 )
+
+fun getNamebyId(id: Int, categories: List<Category>): String {
+    return categories.find { it.id == id }?.name ?: "Categoría"
+}
+
+fun enableQuiz(id: Int, categories: List<Category>) {
+    categories.find { it.id == id }?.quizAvailable = true
+}

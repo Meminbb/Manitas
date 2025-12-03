@@ -28,19 +28,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.manitas.model.Video
 import com.example.manitas.navigation.ScreenNames
 
 
 
 @Composable
 fun SearchBarWithResults(
-    sendas: List<String>,
+    videos: List<Video>,
     onNavigate: (String) -> Unit
 ) {
     var query by remember { mutableStateOf("") }
 
-    val filteredSendas = if (query.isNotEmpty()) {
-        sendas.filter { it.contains(query, ignoreCase = true) }
+    val filteredVideos = if (query.isNotEmpty()) {
+        videos.filter { it.name.contains(query, ignoreCase = true) }
     } else {
         emptyList()
     }
@@ -60,7 +61,6 @@ fun SearchBarWithResults(
 
             Spacer(modifier = Modifier.width(10.dp))
 
-            // Barra de texto de búsqueda
             TextField(
                 value = query,
                 onValueChange = { query = it },
@@ -78,20 +78,21 @@ fun SearchBarWithResults(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        if (filteredSendas.isNotEmpty()) {
+        if (filteredVideos.isNotEmpty()) {
             Column {
-                filteredSendas.forEach { seña ->
+                filteredVideos.forEach { video ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp)
                             .clickable {
-                                onNavigate(ScreenNames.SeñaDetail.createRoute(seña))
+                                onNavigate(
+                                    ScreenNames.VideosporCat.createRoute(video.catId, video.id)
+                                )
                             }
                     ) {
                         Text(
-                            text = seña,
-
+                            text = video.name,
                             fontWeight = FontWeight.SemiBold,
                             color = Color(0xFF1A1A1A),
                             modifier = Modifier.align(Alignment.CenterVertically)

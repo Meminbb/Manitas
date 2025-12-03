@@ -39,9 +39,18 @@ import com.google.firebase.firestore.FirebaseFirestore
 fun VideosporCatScreen(
     idCategory: Int,
     videos: List<Video>,
-    nav: NavHostController? = null
+    nav: NavHostController? = null,
+    selectedVideoId: Int? = null
 ) {
-    var index by remember { mutableStateOf(0) }
+
+    val initialIndex = remember(videos, selectedVideoId) {
+        selectedVideoId?.let { id ->
+            val idx = videos.indexOfFirst { it.id == id }
+            if (idx >= 0) idx else 0
+        } ?: 0
+    }
+
+    var index by remember(videos, selectedVideoId) { mutableStateOf(initialIndex) }
     val current = videos[index]
 
     val auth = FirebaseAuth.getInstance()

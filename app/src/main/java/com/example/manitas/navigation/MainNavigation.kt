@@ -54,6 +54,9 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                 }
             )
         }
+        composable("notificacionesAdd") {
+            NotificacionesAddScreen(nav = nav)
+        }
 
 
         composable(ScreenNames.Progreso.route) {
@@ -65,7 +68,6 @@ fun MainNavigation(modifier: Modifier = Modifier) {
         }
 
 
-        // ---------------------Kevin-------------------------
         composable(ScreenNames.LoginScreen.route) {
             LoginScreen(nav = nav)
         }
@@ -107,10 +109,35 @@ fun MainNavigation(modifier: Modifier = Modifier) {
             )
         }
 
+
         composable(ScreenNames.Quiz.route) {
             QuizScreen()
         }
 
+        composable(
+            route = ScreenNames.VideosporCat.route,
+            arguments = listOf(
+                navArgument("id") { type = NavType.IntType },
+                navArgument("selectedId") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: 0
+            val selectedId = backStackEntry.arguments?.getInt("selectedId") ?: -1
 
+            val videos = getVideos().filter { it.catId == id }
+
+            VideosporCatScreen(
+                idCategory = id,
+                videos = videos,
+                nav = nav,
+                selectedVideoId = if (selectedId != -1) selectedId else null
+            )
+        }
     }
 }
+
+
+

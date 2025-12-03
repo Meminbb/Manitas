@@ -1,27 +1,71 @@
 package com.example.manitas.screens.notificaciones
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import java.time.Instant
-import java.time.ZoneId
+import kotlinx.coroutines.launch
+import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificacionesAddScreen(
-    nav: NavHostController
-) {
+fun NotificacionesAddScreen(nav: NavHostController) {
+
+    val bgBlue = Color(0xFFDDE9F2)
+    val ctx = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    var titulo by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+
+    var agregarFecha by remember { mutableStateOf(false) }
+
+    var fecha by remember { mutableStateOf("") }
+    var horaInicio by remember { mutableStateOf("") }
+    var horaFin by remember { mutableStateOf("") }
+
+    fun openDatePicker() {
+        val cal = Calendar.getInstance()
+        DatePickerDialog(
+            ctx,
+            { _, year, month, day ->
+                fecha = String.format("%02d/%02d/%04d", day, month + 1, year)
+            },
+            cal.get(Calendar.YEAR),
+            cal.get(Calendar.MONTH),
+            cal.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
+
+    fun openTimePicker(onTimeSelected: (String) -> Unit) {
+        val cal = Calendar.getInstance()
+        TimePickerDialog(
+            ctx,
+            { _, hour, minute ->
+                val time = String.format("%02d:%02d", hour, minute)
+                onTimeSelected(time)
+            },
+            cal.get(Calendar.HOUR_OF_DAY),
+            cal.get(Calendar.MINUTE),
+            true
+        ).show()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -29,135 +73,143 @@ fun NotificacionesAddScreen(
             .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
 
-        // -----------------------
-        // TOP BAR
-        // -----------------------
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 24.dp)
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { nav.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Volver"
-                )
+                Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
             }
-
-            Spacer(Modifier.width(8.dp))
-
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Agregar notificación",
+                text = "Agregar\nnotificación",
                 fontSize = 28.sp,
+                lineHeight = 28.sp,
                 fontWeight = FontWeight.Bold
             )
         }
 
-        AdminNotificacionesUI()
-    }
-}
+        Spacer(Modifier.height(20.dp))
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AdminNotificacionesUI() {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(bgBlue, RoundedCornerShape(20.dp))
+                .padding(20.dp)
+        ) {
 
-    // Estados del formulario
-    var titulo by remember { mutableStateOf("") }
-    var descripcion by remember { mutableStateOf("") }
-    var agregarFecha by remember { mutableStateOf(false) }
-    var fechaTexto by remember { mutableStateOf("Seleccionar fecha") }
+            OutlinedTextField(
+                value = titulo,
+                onValueChange = { titulo = it },
+                label = { Text("Título") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            )
 
-    // Estado para mostrar/ocultar DatePicker
-    var showDatePicker by remember { mutableStateOf(false) }
+            Spacer(Modifier.height(16.dp))
 
-    // Estado interno del DatePicker
-    val datePickerState = rememberDatePickerState()
+            OutlinedTextField(
+                value = descripcion,
+                onValueChange = { descripcion = it },
+                label = { Text("Descripción") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            )
 
-    if (showDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        val millis = datePickerState.selectedDateMillis
-                        if (millis != null) {
-                            val localDate = Instant.ofEpochMilli(millis)
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDate()
+            Spacer(Modifier.height(16.dp))
 
-                            fechaTexto = "${localDate.dayOfMonth}/${localDate.monthValue}/${localDate.year}"
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    checked = agregarFecha,
+                    onCheckedChange = { agregarFecha = it }
+                )
+                Text("Agregar fecha")
+            }
+
+            if (agregarFecha) {
+
+                Spacer(Modifier.height(10.dp))
+
+                OutlinedTextField(
+                    value = fecha,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Fecha") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    trailingIcon = {
+                        IconButton(onClick = { openDatePicker() }) {
+                            Icon(Icons.Default.DateRange, contentDescription = "Seleccionar fecha")
                         }
-                        showDatePicker = false
                     }
-                ) { Text("OK") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancelar")
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+
+                    OutlinedTextField(
+                        value = horaInicio,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Hora inicio") },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        trailingIcon = {
+                            IconButton(onClick = { openTimePicker { horaInicio = it } }) {
+                                Icon(Icons.Default.AccessTime, contentDescription = "Hora inicio")
+                            }
+                        }
+                    )
+
+                    Spacer(Modifier.width(12.dp))
+
+                    OutlinedTextField(
+                        value = horaFin,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Hora fin") },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        trailingIcon = {
+                            IconButton(onClick = { openTimePicker { horaFin = it } }) {
+                                Icon(Icons.Default.AccessTime, contentDescription = "Hora fin")
+                            }
+                        }
+                    )
                 }
             }
-        ) {
-            DatePicker(state = datePickerState)
-        }
-    }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFFE3F2FD), RoundedCornerShape(16.dp))
-            .padding(20.dp)
-    ) {
+            Spacer(Modifier.height(20.dp))
 
-        // ---- TÍTULO ----
-        OutlinedTextField(
-            value = titulo,
-            onValueChange = { titulo = it },
-            label = { Text("Título") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(Modifier.height(12.dp))
-
-        // ---- DESCRIPCIÓN ----
-        OutlinedTextField(
-            value = descripcion,
-            onValueChange = { descripcion = it },
-            label = { Text("Descripción") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(Modifier.height(12.dp))
-
-        // ---- CHECKBOX FECHA ----
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(
-                checked = agregarFecha,
-                onCheckedChange = { agregarFecha = it }
-            )
-            Text("Agregar fecha")
-        }
-
-        // ---- DATE PICKER REAL ----
-        if (agregarFecha) {
-            Spacer(Modifier.height(12.dp))
-
-            OutlinedButton(
-                onClick = { showDatePicker = true },
+            Box(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp)
+                contentAlignment = Alignment.CenterEnd
             ) {
-                Text(fechaTexto)
+                IconButton(
+                    onClick = {
+                        scope.launch {
+
+                            val fechaTexto =
+                                if (!agregarFecha || fecha.isBlank()) ""
+                                else fecha  // 👉 YA NO UNE HORAS AQUÍ
+
+                            // ✅ ESTA ES LA CORRECCIÓN PRINCIPAL:
+                            NotificacionesRepository.addNotificacion(
+                                title = titulo,
+                                message = descripcion,
+                                date = fechaTexto,
+                                horaInicio = horaInicio,
+                                horaFin = horaFin
+                            )
+
+                            nav.popBackStack()
+                        }
+                    },
+                    modifier = Modifier
+                        .size(52.dp)
+                        .background(Color(0xFFC7D7E6), RoundedCornerShape(50))
+                ) {
+                    Icon(Icons.Default.Send, contentDescription = "Enviar", tint = Color.Black)
+                }
             }
-        }
-
-        Spacer(Modifier.height(24.dp))
-
-        // ---- BOTÓN ENVIAR ----
-        Button(
-            onClick = { /* acción futura */ },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(10.dp)
-        ) {
-            Text("Enviar")
         }
     }
 }
