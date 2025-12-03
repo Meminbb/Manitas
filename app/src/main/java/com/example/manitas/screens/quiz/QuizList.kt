@@ -79,6 +79,29 @@ fun QuizCategoryCard(
             )
         }
 
+        // Tarjeta con nombre + puntaje
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = Color.White,
+            shadowElevation = 10.dp,
+            modifier = Modifier.padding(0.dp)
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp)) {
+
+                Text(
+                    text = category.name,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 20.sp
+                )
+
+                Text(
+                    text = "Puntaje: $score",
+                    fontSize = 13.sp,
+                    color = Color.Gray
+                )
+            }
+        }
+
         // Overlay si está bloqueado
         if (!isEnabled) {
             Box(
@@ -92,29 +115,6 @@ fun QuizCategoryCard(
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
-                )
-            }
-        }
-
-        // Tarjeta con nombre + puntaje
-        Surface(
-            shape = RoundedCornerShape(16.dp),
-            color = Color.White,
-            shadowElevation = 10.dp,
-            modifier = Modifier.padding(0.dp)
-        ) {
-            Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp)) {
-
-                Text(
-                    text = category.name,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 24.sp
-                )
-
-                Text(
-                    text = "Puntaje: $score",
-                    fontSize = 16.sp,
-                    color = Color.Gray
                 )
             }
         }
@@ -176,6 +176,8 @@ fun QuizCategoriesScreen(
                 fontSize = 50.sp,
             )
         }
+
+        Spacer(Modifier.height(15.dp))
 
         LazyColumn {
             items(categories) { category ->

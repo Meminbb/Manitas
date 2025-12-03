@@ -145,6 +145,7 @@ fun ProgresoScreen(
 
     val db = FirebaseFirestore.getInstance()
     var quizAv by remember { mutableStateOf<Set<Int>>(emptySet()) }
+    var scores by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
 
 
     LaunchedEffect(userId) {
@@ -156,6 +157,9 @@ fun ProgresoScreen(
             .addOnSuccessListener { doc ->
                 val list = doc.get("quizAv") as? List<Number>
                 quizAv = list?.map { it.toInt() }?.toSet() ?: emptySet()
+
+                val list2 = doc.get("quizScores") as? Map<String, Number>
+                scores = list2?.mapValues { it.value.toInt() } ?: emptyMap()
             }
     }
 
@@ -165,7 +169,6 @@ fun ProgresoScreen(
             .background(Color.White)
             .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
-        // Top bar
         Row(modifier = Modifier
             .padding(start = 6.dp, top = 40.dp)
             .fillMaxWidth()) {
@@ -220,16 +223,21 @@ fun ProgresoScreen(
                 color = Color.Black
             )
 
+            val categoriesWithScore = categories.filter { category ->
+                scores.containsKey(category.id.toString())
+            }
+
             LazyColumn {
-                items(categories) { category ->
+                items(categoriesWithScore) { category ->
                     Box(modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 10.dp, bottom = 10.dp),
                         contentAlignment = Alignment.Center)
                     {
+                        val score_current = scores[category.id.toString()] ?: 0
                         QuizResultCard(
                             category.name,
-                            category.score
+                            score_current
                         )
                     }
                 }

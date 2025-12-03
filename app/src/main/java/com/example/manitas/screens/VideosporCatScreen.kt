@@ -96,24 +96,24 @@ fun VideosporCatScreen(
             .background(Color.White)
             .padding(horizontal = 24.dp, vertical = 12.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(top = 40.dp,bottom = 2.dp)
-        ) {
-            IconButton(onClick = { nav?.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBackIosNew,
-                    contentDescription = "Volver",
-                    tint = Color.Black
-                )
-            }
+        Row(modifier = Modifier
+            .padding(start = 6.dp, top = 40.dp)
+            .fillMaxWidth()) {
 
-            Spacer(Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.Filled.ArrowBackIosNew,
+                contentDescription = "Volver",
+                tint = Color.Black,
+                modifier = Modifier
+                    .size(40.dp)
+                    .padding(top = 13.dp)
+                    .clickable { nav?.popBackStack() }
+            )
+            Spacer(Modifier.width(9.dp))
 
             Text(
-                text = categoryName, //envez de poner id category llama una función para get el name
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
+                text = categoryName,
+                fontSize = 42.sp,
                 color = Color.Black
             )
         }

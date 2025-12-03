@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DoorFront
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -195,7 +196,7 @@ fun MenuScreen(
                 onClick = { onNavigate(ScreenNames.Categorias.route) }
             )
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(5.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -299,12 +300,13 @@ fun MenuScreen(
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp)
+                .padding(16.dp),
+            containerColor = Color(0xFFEDF3F7)
         ) {
             Icon(
-                imageVector = Icons.Default.DoorFront,
+                imageVector = Icons.Default.Logout,
                 contentDescription = "Log Out",
-                tint = Color.White,
+                tint = Color.Black,
                 modifier = Modifier.size(24.dp)
             )
         }

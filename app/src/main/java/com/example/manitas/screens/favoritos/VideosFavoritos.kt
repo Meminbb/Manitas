@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -94,23 +96,25 @@ fun VideosFavoritosScreen(
             .padding(horizontal = 24.dp, vertical = 12.dp)
     ) {
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 16.dp)
-        ) {
-            IconButton(onClick = { nav.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Volver"
-                )
-            }
+        Row(modifier = Modifier
+            .padding(start = 6.dp, top = 40.dp)
+            .fillMaxWidth()) {
 
-            Spacer(Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.Filled.ArrowBackIosNew,
+                contentDescription = "Volver",
+                tint = Color.Black,
+                modifier = Modifier
+                    .size(40.dp)
+                    .padding(top = 13.dp)
+                    .clickable { nav.popBackStack() }
+            )
+            Spacer(Modifier.width(9.dp))
 
             Text(
                 text = "Tus favoritos",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold
+                fontSize = 50.sp,
+                color = Color.Black
             )
         }
 
