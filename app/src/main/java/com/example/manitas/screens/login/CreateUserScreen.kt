@@ -22,7 +22,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.manitas.R
 import com.example.manitas.datastore.UserDataStore
-import com.example.manitas.model.quiz
 import com.example.manitas.navigation.ScreenNames
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

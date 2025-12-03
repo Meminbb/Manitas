@@ -20,6 +20,7 @@ import com.example.manitas.screens.login.CreateUserScreen
 import com.example.manitas.screens.progreso.ProgresoScreen
 import com.example.manitas.screens.notificaciones.NotificacionesScreen
 import com.example.manitas.screens.notificaciones.NotificacionesAddScreen
+import com.example.manitas.screens.quiz.QuizCategoriesScreen
 import com.example.manitas.screens.quiz.QuizScreen
 
 
@@ -110,8 +111,17 @@ fun MainNavigation(modifier: Modifier = Modifier) {
         }
 
 
-        composable(ScreenNames.Quiz.route) {
-            QuizScreen()
+
+
+        composable(ScreenNames.QuizList.route) {
+            val categories = getCategories()
+            QuizCategoriesScreen(
+                categories = categories,
+                nav = nav,
+                onItemClick = { category ->
+                    nav.navigate(ScreenNames.QuizQuestionbyCat.createRoute(category.id))
+                }
+            )
         }
 
         composable(
