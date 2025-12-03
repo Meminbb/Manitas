@@ -1,155 +1,246 @@
 package com.example.manitas.screens.quiz
 
+import android.net.Uri
+import android.widget.FrameLayout
+import android.widget.VideoView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import com.example.manitas.model.getQuizQuestionsbyCat
+import androidx.compose.foundation.layout.WindowInsets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuizScreen() {
-    var selectedAnswer by remember { mutableStateOf<String?>(null) }
-    var currentQuestion by remember { mutableStateOf(1) }
-    val totalQuestions = 10
+fun QuizScreen(
+    categoryId: Int,
+    categoryName: String,
+    onBack: () -> Unit,
+    onQuizFinished: (score: Int) -> Unit
+) {
+    val questions = remember(categoryId) { getQuizQuestionsbyCat(categoryId) }
+
+    if (questions.isEmpty()) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("No hay preguntas disponibles")
+        }
+        return
+    }
+
+    // States
+    var currentIndex by remember { mutableStateOf(0) }
+    var selectedAnswerIndex by remember { mutableStateOf<Int?>(null) }
+    var correctAnswers by remember { mutableStateOf(0) }
+    var showCorrection by remember { mutableStateOf(false) }
+    var isAnswerCorrect by remember { mutableStateOf<Boolean?>(null) }
+
+    val currentQuestion = questions[currentIndex]
+    val totalQuestions = questions.size
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = { /* Navegar atrás */ }) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Volver"
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White),
+                windowInsets = WindowInsets(0)
             )
-        }
+        },
+        contentWindowInsets = WindowInsets(0)
     ) { paddingValues ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 24.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             // Título
             Text(
                 text = "Quiz",
-                fontSize = 48.sp,
+                fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 8.dp)
             )
 
-            // Subtítulo
+            // Categoría
             Text(
-                text = "Frutas",
-                fontSize = 20.sp,
+                text = categoryName,
+                fontSize = 18.sp,
                 color = Color.Gray,
-                modifier = Modifier.padding(bottom = 24.dp)
+                modifier = Modifier.padding(bottom = 4.dp)
             )
 
-            // Área del video (cuadro gris por ahora)
+            // Pregunta
+            Text(
+                text = currentQuestion.questionText,
+                fontSize = 18.sp,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            // VIDEO
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(320.dp)
-                    .background(
-                        color = Color(0xFFBDBDBD),
-                        shape = RoundedCornerShape(16.dp)
-                    ),
+                    .height(280.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.Black),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Área del Video",
-                    color = Color.White,
-                    fontSize = 18.sp
-                )
+                SimpleVideoPlayer(mediaId = currentQuestion.mediaId)
             }
 
             // Contador de preguntas
             Text(
-                text = "$currentQuestion / $totalQuestions",
-                fontSize = 16.sp,
+                text = "${currentIndex + 1} / $totalQuestions",
+                fontSize = 14.sp,
                 color = Color.Gray,
-                modifier = Modifier.padding(vertical = 20.dp)
+                modifier = Modifier.padding(vertical = 12.dp)
             )
 
-            // Opciones de respuesta (2x2 grid)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Row(
+            // Opciones de respuesta
+            if (!showCorrection) {
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    AnswerButton(
-                        text = "Manzana",
-                        isSelected = selectedAnswer == "Manzana",
-                        onClick = { selectedAnswer = "Manzana" },
-                        modifier = Modifier.weight(1f)
-                    )
-                    AnswerButton(
-                        text = "Plátano",
-                        isSelected = selectedAnswer == "Plátano",
-                        onClick = { selectedAnswer = "Plátano" },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+                    val answers = currentQuestion.answerOptions
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    AnswerButton(
-                        text = "Naranja",
-                        isSelected = selectedAnswer == "Naranja",
-                        onClick = { selectedAnswer = "Naranja" },
-                        modifier = Modifier.weight(1f)
-                    )
-                    AnswerButton(
-                        text = "Fresa",
-                        isSelected = selectedAnswer == "Fresa",
-                        onClick = { selectedAnswer = "Fresa" },
-                        modifier = Modifier.weight(1f)
-                    )
+                    answers.chunked(2).forEachIndexed { rowIndex, row ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            row.forEachIndexed { colIndex, optionText ->
+                                val optionIndex = rowIndex * 2 + colIndex
+
+                                AnswerButton(
+                                    text = optionText,
+                                    isSelected = selectedAnswerIndex == optionIndex,
+                                    onClick = { selectedAnswerIndex = optionIndex },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Botón de siguiente/reproducir
-            FloatingActionButton(
-                onClick = {
-                    // Lógica para siguiente pregunta
-                    if (currentQuestion < totalQuestions) {
-                        currentQuestion++
-                        selectedAnswer = null
+            if (showCorrection) {
+
+                if (isAnswerCorrect == true) {
+                    Text(
+                        text = "¡Correcto!",
+                        fontSize = 20.sp,
+                        color = Color(0xFF4CAF50),
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 12.dp)
+                            .background(Color(0xFFC8E6C9), RoundedCornerShape(12.dp))
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Muy bien, sigue así!",
+                            fontSize = 18.sp,
+                            color = Color(0xFF1B5E20)
+                        )
                     }
-                },
-                containerColor = Color(0xFFB3E5FC),
-                modifier = Modifier.padding(bottom = 32.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.PlayArrow,
-                    contentDescription = "Siguiente",
-                    tint = Color.White
-                )
+                }
+
+                // Si la respuesta es incorrecta
+                if (isAnswerCorrect == false) {
+                    Text(
+                        text = "Respuesta Incorrecta",
+                        fontSize = 18.sp,
+                        color = Color.Red,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 12.dp)
+                            .background(Color(0xFFB2FF59), RoundedCornerShape(12.dp))
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = " Respuesta correcta: ${currentQuestion.answerOptions[currentQuestion.correctAnswer]}",
+                            fontSize = 16.sp,
+                            color = Color.Black
+                        )
+                    }
+                }
+
+                // Botón de siguiente
+                Button(
+                    onClick = {
+                        if (currentIndex < totalQuestions - 1) {
+                            currentIndex++
+                            selectedAnswerIndex = null
+                            showCorrection = false
+                            isAnswerCorrect = null
+                        } else {
+                            val score = (correctAnswers * 100) / totalQuestions
+                            onQuizFinished(score)
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 24.dp)
+                ) {
+                    Text("Siguiente", fontSize = 18.sp)
+                }
+
+            } else {
+                // Botón de enviar
+                Button(
+                    onClick = {
+                        val selected = selectedAnswerIndex ?: return@Button
+                        isAnswerCorrect = selected == currentQuestion.correctAnswer
+
+                        if (isAnswerCorrect == true) correctAnswers++
+                        showCorrection = true
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 24.dp),
+                    enabled = selectedAnswerIndex != null
+                ) {
+                    Text("Enviar", fontSize = 18.sp)
+                }
             }
         }
     }
@@ -175,18 +266,46 @@ fun AnswerButton(
             color = if (isSelected) Color(0xFF4FC3F7) else Color(0xFFE0E0E0)
         )
     ) {
-        Text(
-            text = text,
-            fontSize = 16.sp
-        )
+        Text(text, fontSize = 16.sp)
     }
 }
 
-// Preview
-@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
+@Composable
+fun SimpleVideoPlayer(mediaId: Int) {
+    val context = LocalContext.current
+
+    AndroidView(
+        factory = { ctx ->
+            VideoView(ctx).apply {
+                val uri = Uri.parse("android.resource://${ctx.packageName}/$mediaId")
+                setVideoURI(uri)
+                setOnCompletionListener { start() }
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+                )
+                start()
+            }
+        },
+        update = { view ->
+            val uri = Uri.parse("android.resource://${context.packageName}/$mediaId")
+            view.setVideoURI(uri)
+            view.setOnCompletionListener { view.start() }
+            view.start()
+        },
+        modifier = Modifier.fillMaxSize()
+    )
+}
+
+@Preview(showBackground = true)
 @Composable
 fun QuizScreenPreview() {
     MaterialTheme {
-        QuizScreen()
+        QuizScreen(
+            categoryId = 1,
+            categoryName = "Frutas",
+            onBack = {},
+            onQuizFinished = {}
+        )
     }
 }
