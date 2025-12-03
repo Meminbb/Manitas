@@ -7,6 +7,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -23,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -150,8 +153,40 @@ fun VideosFavoritosScreen(
             }
 
             else -> {
-                val current = favVideos[index]
+                val safeIndex = index.coerceIn(0, favVideos.lastIndex)
+                index = safeIndex
+                val current = favVideos[safeIndex]
+
                 val isCurrentFav = favIds.contains(current.id)
+
+                LazyRow(
+                    modifier = Modifier
+                        .padding(top = 25.dp, bottom = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    itemsIndexed(favVideos) { idx, video ->
+                        val isSelected = idx == index
+
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(40))
+                                .background(
+                                    if (isSelected) Color(0xFFBED2E0)
+                                    else Color(0xFFEFF3F7)
+                                )
+                                .clickable { index = idx }
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = video.name,
+                                fontSize = 14.sp,
+                                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                                color = Color.Black
+                            )
+                        }
+                    }
+                }
+
 
                 Box(
                     modifier = Modifier
@@ -161,7 +196,9 @@ fun VideosFavoritosScreen(
                 ) {
                     IconButton(
                         onClick = {
-                            index = if (index > 0) index - 1 else favVideos.lastIndex
+                            if (favVideos.isNotEmpty()) {
+                                index = (index - 1).mod(favVideos.size)
+                            }
                         },
                         modifier = Modifier.align(Alignment.CenterStart)
                     ) {
@@ -221,7 +258,9 @@ fun VideosFavoritosScreen(
 
                     IconButton(
                         onClick = {
-                            index = if (index < favVideos.lastIndex) index + 1 else 0
+                            if (favVideos.isNotEmpty()) {
+                                index = (index + 1).mod(favVideos.size)
+                            }
                         },
                         modifier = Modifier.align(Alignment.CenterEnd)
                     ) {
