@@ -37,7 +37,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.manitas.model.MediaType
 import com.example.manitas.model.Video
-import com.example.manitas.model.enableQuiz
 import com.example.manitas.model.getCategories
 import com.example.manitas.model.getNamebyId
 import com.example.manitas.model.getVideos
@@ -46,7 +45,6 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
 
-//buscar como get el nombre de la categoria y como modificar true y false el quiz available
 @SuppressLint("LocalContextResourcesRead")
 @Composable
 fun VideosporCatScreen(
@@ -91,7 +89,6 @@ fun VideosporCatScreen(
     }
 
     val isCurrentFav = favSet.contains(current.id)
-    val localquizAv = quizAv.contains(current.id)
 
     Column(
         modifier = Modifier

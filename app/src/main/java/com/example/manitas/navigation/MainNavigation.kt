@@ -1,6 +1,7 @@
 package com.example.manitas.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -22,6 +23,8 @@ import com.example.manitas.screens.notificaciones.NotificacionesScreen
 import com.example.manitas.screens.notificaciones.NotificacionesAddScreen
 import com.example.manitas.screens.quiz.QuizCategoriesScreen
 import com.example.manitas.screens.quiz.QuizScreen
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 @Composable
@@ -106,7 +109,8 @@ fun MainNavigation(modifier: Modifier = Modifier) {
 
 
         composable(ScreenNames.QuizList.route) {
-            val categories = getCategories()
+            val categories = remember { getCategories() }
+
             QuizCategoriesScreen(
                 categories = categories,
                 nav = nav,
@@ -117,10 +121,10 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                             category.name
                         )
                     )
-
                 }
             )
         }
+
 
         composable(
             route = ScreenNames.QuizQuestionbyCat.route,
@@ -133,13 +137,31 @@ fun MainNavigation(modifier: Modifier = Modifier) {
             val id = backStackEntry.arguments?.getInt("id") ?: 0
             val name = backStackEntry.arguments?.getString("name") ?: ""
 
+            val auth = FirebaseAuth.getInstance()
+            val userId = auth.currentUser?.uid
+            val db = FirebaseFirestore.getInstance()
+
             QuizScreen(
                 categoryId = id,
                 categoryName = name,
                 onBack = { nav.popBackStack() },
                 onQuizFinished = { score ->
-                    // Puedes guardar el score aquí
-                    nav.popBackStack() // o ir a resultados
+
+                    if (userId != null) {
+                        val docRef = db.collection("users").document(userId)
+
+                        val fieldName = "quizScores.$id"
+
+                        docRef.get().addOnSuccessListener { doc ->
+                            val currentMap = doc.get("quizScores") as? Map<String, Number>
+                            val currentScore = currentMap?.get(id.toString())?.toInt() ?: 0
+                            if (score > currentScore) {
+                                docRef.update(fieldName, score)
+                            }
+                        }
+                    }
+
+                    nav.popBackStack()
                 }
             )
         }
