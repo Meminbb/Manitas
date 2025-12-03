@@ -123,8 +123,8 @@ fun VideosporCatScreen(
 
         LazyRow(
             modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 50.dp, bottom = 24.dp),
+
+                .padding(top = 25.dp, bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             itemsIndexed(videos) { idx, video ->

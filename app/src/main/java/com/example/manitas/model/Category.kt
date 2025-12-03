@@ -12,7 +12,7 @@ class Category (
     val icon: String,
     @DrawableRes val img: Int,
     quizAvailable: Boolean,
-    score : Int = 0
+    score : Int = 0,
 ){
     var quizAvailable by mutableStateOf(quizAvailable)
     var score by mutableStateOf(score)
@@ -20,11 +20,16 @@ class Category (
 
 
 fun getCategories(): List<Category> = listOf(
-    Category(1,"Frutas", "🍎", R.drawable.frutas, false),
+    Category(1,"Frutas", "🍎", R.drawable.frutas, false,),
     Category(2,"Abecedario","🔤",R.drawable.abc, false),
-    Category(3,"Colores","🎨",R.drawable.colores, false),
-    Category(4,"Animales", "🐶",R.drawable.animales, false),
-    Category(5,"Saludos", "🐶",R.drawable.saludos, false)
+    Category(6,"Comida", "🐶",R.drawable.comida_imagen, false),
+    Category(4,"Numeros", "🐶",R.drawable.numeros, false),
+    Category(5,"Saludos", "🐶",R.drawable.saludos, false),
+    Category(3,"Ropa","🎨",R.drawable.ropa, false),
+    Category(7,"Hogar", "🐶",R.drawable.hogar, false),
+    Category(8,"Lugares", "🐶",R.drawable.museo, false),
+    Category(9,"Animales", "🐶",R.drawable.animales, false),
+    Category(10,"Colores", "🐶",R.drawable.colores, false),
 
 
 )
