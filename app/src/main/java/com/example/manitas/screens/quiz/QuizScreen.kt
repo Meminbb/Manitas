@@ -42,7 +42,7 @@ fun QuizScreen(
         return
     }
 
-    // ESTADOS
+    // States
     var currentIndex by remember { mutableStateOf(0) }
     var selectedAnswerIndex by remember { mutableStateOf<Int?>(null) }
     var correctAnswers by remember { mutableStateOf(0) }
@@ -80,7 +80,7 @@ fun QuizScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // TÍTULO
+            // Título
             Text(
                 text = "Quiz",
                 fontSize = 40.sp,
@@ -88,7 +88,7 @@ fun QuizScreen(
                 modifier = Modifier.padding(top = 8.dp)
             )
 
-            // CATEGORÍA
+            // Categoría
             Text(
                 text = categoryName,
                 fontSize = 18.sp,
@@ -96,7 +96,7 @@ fun QuizScreen(
                 modifier = Modifier.padding(bottom = 4.dp)
             )
 
-            // PREGUNTA
+            // Pregunta
             Text(
                 text = currentQuestion.questionText,
                 fontSize = 18.sp,
@@ -115,7 +115,7 @@ fun QuizScreen(
                 SimpleVideoPlayer(mediaId = currentQuestion.mediaId)
             }
 
-            // CONTADOR
+            // Contador de preguntas
             Text(
                 text = "${currentIndex + 1} / $totalQuestions",
                 fontSize = 14.sp,
@@ -123,7 +123,7 @@ fun QuizScreen(
                 modifier = Modifier.padding(vertical = 12.dp)
             )
 
-            // OPCIONES
+            // Opciones de respuesta
             if (!showCorrection) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -179,7 +179,7 @@ fun QuizScreen(
                     }
                 }
 
-                // RESPUESTA INCORRECTA
+                // Si la respuesta es incorrecta
                 if (isAnswerCorrect == false) {
                     Text(
                         text = "Respuesta Incorrecta",
@@ -204,7 +204,7 @@ fun QuizScreen(
                     }
                 }
 
-                // BOTÓN SIGUIENTE
+                // Botón de siguiente
                 Button(
                     onClick = {
                         if (currentIndex < totalQuestions - 1) {
@@ -225,7 +225,7 @@ fun QuizScreen(
                 }
 
             } else {
-                // BOTÓN ENVIAR
+                // Botón de enviar
                 Button(
                     onClick = {
                         val selected = selectedAnswerIndex ?: return@Button

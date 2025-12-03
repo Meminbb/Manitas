@@ -78,7 +78,7 @@ fun QuizCategoryCard(
             )
         }
 
-        // White card with the name + score
+        // Tarjeta con el nombre de la categoría y su puntaje
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = Color.White,
@@ -93,7 +93,7 @@ fun QuizCategoryCard(
                     fontSize = 28.sp
                 )
 
-                // Show score below name
+                // Muestra el puntaje de la categoría
                 Text(
                     text = "Puntaje: ${category.score}",
                     fontSize = 18.sp,

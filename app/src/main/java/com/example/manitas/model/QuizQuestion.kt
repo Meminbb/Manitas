@@ -38,5 +38,15 @@ fun getQuizQuestionsbyCat(categoryId: Int): List<QuizQuestion> = listOf(
         questionText = "¿Cuál es esta fruta?",
         answerOptions = listOf("Manzana", "Naranja", "Banano" , "Piña"),
         correctAnswer = 2
+    ),
+    QuizQuestion(
+        id = 4,
+        categoryId = 1,
+        name = "Test",
+        mediaId = R.raw.frutas_banano,
+        questionText = "¿Cuál es esta fruta?",
+        answerOptions = listOf("Manzana", "Test", "Banano" , "Piña"),
+        correctAnswer = 2
     )
+
 ).filter { it.categoryId == categoryId }
