@@ -75,14 +75,15 @@ fun NotificacionesAddScreen(nav: NavHostController) {
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { nav.popBackStack() }) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Color.Black)
             }
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "Agregar\nnotificación",
                 fontSize = 28.sp,
                 lineHeight = 28.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
             )
         }
 
@@ -100,7 +101,8 @@ fun NotificacionesAddScreen(nav: NavHostController) {
                 onValueChange = { titulo = it },
                 label = { Text("Título") },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                textStyle = LocalTextStyle.current.copy(color = Color.Black),
             )
 
             Spacer(Modifier.height(16.dp))
@@ -110,7 +112,9 @@ fun NotificacionesAddScreen(nav: NavHostController) {
                 onValueChange = { descripcion = it },
                 label = { Text("Descripción") },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                textStyle = LocalTextStyle.current.copy(color = Color.Black),
+
             )
 
             Spacer(Modifier.height(16.dp))
@@ -120,7 +124,7 @@ fun NotificacionesAddScreen(nav: NavHostController) {
                     checked = agregarFecha,
                     onCheckedChange = { agregarFecha = it }
                 )
-                Text("Agregar fecha")
+                Text("Agregar fecha", color = Color.Black)
             }
 
             if (agregarFecha) {
@@ -134,6 +138,7 @@ fun NotificacionesAddScreen(nav: NavHostController) {
                     label = { Text("Fecha") },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
+                    textStyle = LocalTextStyle.current.copy(color = Color.Black),
                     trailingIcon = {
                         IconButton(onClick = { openDatePicker() }) {
                             Icon(Icons.Default.DateRange, contentDescription = "Seleccionar fecha")
@@ -152,6 +157,7 @@ fun NotificacionesAddScreen(nav: NavHostController) {
                         label = { Text("Hora inicio") },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
+                        textStyle = LocalTextStyle.current.copy(color = Color.Black),
                         trailingIcon = {
                             IconButton(onClick = { openTimePicker { horaInicio = it } }) {
                                 Icon(Icons.Default.AccessTime, contentDescription = "Hora inicio")
@@ -168,6 +174,7 @@ fun NotificacionesAddScreen(nav: NavHostController) {
                         label = { Text("Hora fin") },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
+                        textStyle = LocalTextStyle.current.copy(color = Color.Black),
                         trailingIcon = {
                             IconButton(onClick = { openTimePicker { horaFin = it } }) {
                                 Icon(Icons.Default.AccessTime, contentDescription = "Hora fin")
@@ -189,9 +196,8 @@ fun NotificacionesAddScreen(nav: NavHostController) {
 
                             val fechaTexto =
                                 if (!agregarFecha || fecha.isBlank()) ""
-                                else fecha  // 👉 YA NO UNE HORAS AQUÍ
+                                else fecha
 
-                            // ✅ ESTA ES LA CORRECCIÓN PRINCIPAL:
                             NotificacionesRepository.addNotificacion(
                                 title = titulo,
                                 message = descripcion,

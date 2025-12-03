@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -142,7 +143,8 @@ fun MenuScreen(
                     .fillMaxWidth()
                     .padding(bottom = 30.dp)
                     .padding(top = 40.dp),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = Color.Black
             )
 
             Row(
@@ -181,6 +183,7 @@ fun MenuScreen(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
                     ),
+                    textStyle = LocalTextStyle.current.copy(color = Color.Black),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -235,7 +238,8 @@ fun MenuScreen(
                         leading = {
                             Icon(
                                 imageVector = Icons.Default.Favorite,
-                                contentDescription = null
+                                contentDescription = null,
+                                tint = Color.Red
                             )
                         },
                         onClick = { onNavigate(ScreenNames.Favoritos.route) }
