@@ -7,8 +7,8 @@ data class QuizQuestion(
     val id: Int,
     val categoryId: Int,
     val name: String,
-    val mediaId: Int,          // id de recurso (video o imagen)
-    val mediaType: MediaType,  // VIDEO o IMAGE
+    val mediaId: Int,
+    val mediaType: MediaType,
     val questionText: String,
     val answerOptions: List<String>,
     val correctAnswer: Int
@@ -19,7 +19,7 @@ fun getQuizQuestionsbyCat(categoryId: Int): List<QuizQuestion> = listOf(
         id = 1,
         categoryId = 1,
         name = "Manzana",
-        mediaId = R.raw.frutas_manzana,              // VIDEO
+        mediaId = R.raw.frutas_manzana,
         mediaType = MediaType.VIDEO,
         questionText = "Selecciona el significado correcto",
         answerOptions = listOf("Manzana", "Naranja", "Banano", "Piña"),
@@ -29,7 +29,7 @@ fun getQuizQuestionsbyCat(categoryId: Int): List<QuizQuestion> = listOf(
         id = 2,
         categoryId = 1,
         name = "Naranja",
-        mediaId = R.raw.frutas_naranja,              // VIDEO
+        mediaId = R.raw.frutas_naranja,
         mediaType = MediaType.VIDEO,
         questionText = "¿Cuál es esta fruta?",
         answerOptions = listOf("Manzana", "Naranja", "Banano", "Piña"),
@@ -39,13 +39,13 @@ fun getQuizQuestionsbyCat(categoryId: Int): List<QuizQuestion> = listOf(
         id = 3,
         categoryId = 1,
         name = "Banano",
-        mediaId = R.raw.frutas_banano,               // VIDEO
+        mediaId = R.raw.frutas_banano,
         mediaType = MediaType.VIDEO,
         questionText = "¿Cuál es esta fruta?",
         answerOptions = listOf("Manzana", "Naranja", "Banano" , "Piña"),
         correctAnswer = 2
     ),
-    // Ejemplo extra en misma categoria
+
     QuizQuestion(
         id = 4,
         categoryId = 1,
@@ -56,12 +56,12 @@ fun getQuizQuestionsbyCat(categoryId: Int): List<QuizQuestion> = listOf(
         answerOptions = listOf("Manzana", "Test", "Banano" , "Piña"),
         correctAnswer = 2
     ),
-    // Pregunta que usa IMAGEN (asegúrate que estos recursos sean drawables)
+
     QuizQuestion(
         id = 5,
         categoryId = 2,
         name = "A",
-        mediaId = R.raw.letras_a,      // ⬅️ IMPORTANTE: que sea imagen (drawable)
+        mediaId = R.raw.letras_a,
         mediaType = MediaType.IMAGE,
         questionText = "¿Qué letra es esta?",
         answerOptions = listOf("A", "B", "C" , "D"),
@@ -76,5 +76,26 @@ fun getQuizQuestionsbyCat(categoryId: Int): List<QuizQuestion> = listOf(
         questionText = "¿Qué letra es esta?",
         answerOptions = listOf("A", "B", "C" , "D"),
         correctAnswer = 1
-    )
+    ),
+    QuizQuestion(
+        id = 7,
+        categoryId = 2,
+        name = "C",
+        mediaId = R.raw.letras_c,
+        mediaType = MediaType.IMAGE,
+        questionText = "¿Qué letra es esta?",
+        answerOptions = listOf("A", "B", "C" , "D"),
+        correctAnswer = 2
+    ),
+    QuizQuestion(
+        id = 7,
+        categoryId = 2,
+        name = "D",
+        mediaId = R.raw.letras_d,
+        mediaType = MediaType.IMAGE,
+        questionText = "¿Qué letra es esta?",
+        answerOptions = listOf("A", "B", "C" , "D"),
+        correctAnswer = 2
+),
+
 ).filter { it.categoryId == categoryId }
