@@ -233,7 +233,11 @@ fun QuizScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 24.dp)
+                        .padding(vertical = 24.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFBED2E0),
+                        contentColor = Color.Black
+                    )
                 ) {
                     Text("Siguiente", fontSize = 18.sp)
                 }
@@ -251,10 +255,15 @@ fun QuizScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 24.dp),
-                    enabled = selectedAnswerIndex != null
+                    enabled = selectedAnswerIndex != null,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFBED2E0),
+                        contentColor = Color.Black
+                    )
                 ) {
                     Text("Enviar", fontSize = 18.sp)
                 }
+
             }
         }
     }
