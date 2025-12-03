@@ -1,6 +1,7 @@
 package com.example.manitas.screens.quiz
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -110,7 +111,8 @@ fun QuizCategoriesScreen(
     nav: NavHostController,
     onItemClick: (Category) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize()
+        .background(Color.White)) {
 
         // Header
         Row(
