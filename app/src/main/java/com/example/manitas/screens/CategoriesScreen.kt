@@ -3,6 +3,7 @@ package com.example.manitas.screens
 import android.R.attr.category
 import android.R.attr.text
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -92,7 +93,8 @@ fun CategoryCard(
                 text = category.name,
                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 28.sp
+                fontSize = 28.sp,
+                color = Color.Black
             )
         }
     }
@@ -104,7 +106,8 @@ fun CategoriesScreen(
     nav: NavHostController,
     onItemClick: (Category) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize()
+        .background(Color.White)) {
 
         Row(modifier = Modifier.padding(start = 20.dp, top = 40.dp)
             .fillMaxWidth()) {
@@ -112,13 +115,17 @@ fun CategoriesScreen(
             Icon(
                 imageVector = Icons.Filled.ArrowBackIosNew,
                 contentDescription = "Volver",
+                tint = Color.Black,
                 modifier = Modifier.size(40.dp)
-                    .padding(top = 10.dp)
+                    .padding(top = 13.dp)
                     .clickable{nav.popBackStack()}
             )
+            Spacer(Modifier.width(9.dp))
+
             Text(
                 text = "Categorías",
                 fontSize = 50.sp,
+                color = Color.Black
             )
 
         }
