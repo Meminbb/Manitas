@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
@@ -60,6 +61,8 @@ fun VideosporCatScreen(
 
     var index by remember(videos, selectedVideoId) { mutableStateOf(initialIndex) }
     val current = videos[index]
+    val categoryName = getNamebyId(idCategory, getCategories())
+
 
     val auth = FirebaseAuth.getInstance()
     val userId = auth.currentUser?.uid
@@ -67,6 +70,7 @@ fun VideosporCatScreen(
     val db = FirebaseFirestore.getInstance()
 
     var favSet by remember { mutableStateOf<Set<Int>>(emptySet()) }
+    var quizAv by remember { mutableStateOf<Set<Int>>(emptySet()) }
 
     LaunchedEffect(userId) {
         if (userId.isNullOrEmpty()) return@LaunchedEffect
@@ -76,11 +80,14 @@ fun VideosporCatScreen(
             .get()
             .addOnSuccessListener { doc ->
                 val list = doc.get("Fav") as? List<Number>
+                val list2 = doc.get("quizAv") as? List<Number>
                 favSet = list?.map { it.toInt() }?.toSet() ?: emptySet()
+                quizAv = list2?.map { it.toInt() }?.toSet() ?: emptySet()
             }
     }
 
     val isCurrentFav = favSet.contains(current.id)
+    val localquizAv = quizAv.contains(current.id)
 
     Column(
         modifier = Modifier
@@ -90,12 +97,13 @@ fun VideosporCatScreen(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(top = 40.dp,bottom = 2.dp)
         ) {
             IconButton(onClick = { nav?.popBackStack() }) {
                 Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Volver"
+                    imageVector = Icons.Default.ArrowBackIosNew,
+                    contentDescription = "Volver",
+                    tint = Color.Black
                 )
             }
 
@@ -104,7 +112,8 @@ fun VideosporCatScreen(
             Text(
                 text = categoryName, //envez de poner id category llama una función para get el name
                 fontSize = 32.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
             )
         }
 
@@ -122,7 +131,8 @@ fun VideosporCatScreen(
                 if (index > 0) {
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowLeft,
-                        contentDescription = "Anterior"
+                        contentDescription = "Anterior",
+                        tint = Color.Black
                     )
                 }
             }
@@ -130,10 +140,10 @@ fun VideosporCatScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth(0.75f)
-                    .fillMaxHeight(0.7f),
+                    .height(260.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFE0E0E0)
+                    containerColor = Color(194, 216, 229)
                 )
             ) {
                 Box(
@@ -184,7 +194,17 @@ fun VideosporCatScreen(
                     {
                         index++
                     } else {
-                        enableQuiz(idCategory, getCategories())
+                        val uid = userId ?: return@IconButton
+                        val docRef = db.collection("users").document(userId)
+
+                        if (quizAv.contains(current.catId)) {
+
+                            return@IconButton
+
+                        } else {
+                            quizAv = quizAv + current.catId
+                            docRef.update("quizAv", FieldValue.arrayUnion(current.catId))
+                        }
 
                         Toast.makeText(
                             context,
@@ -200,7 +220,8 @@ fun VideosporCatScreen(
                         Icons.Default.KeyboardArrowRight
                     else
                         Icons.Default.Check,
-                    contentDescription = "Siguiente"
+                    contentDescription = "Siguiente",
+                    tint = Color.Black
                 )
 
             }
@@ -209,7 +230,7 @@ fun VideosporCatScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp),
+                .padding(start = 16.dp, end = 16.dp , bottom = 60.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
@@ -219,7 +240,8 @@ fun VideosporCatScreen(
                 Text(
                     text = current.name,
                     fontSize = 22.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = Color.Black
                 )
             }
             if (!userId.isNullOrEmpty()) {
