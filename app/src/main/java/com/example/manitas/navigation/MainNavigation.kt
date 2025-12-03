@@ -119,7 +119,35 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                 categories = categories,
                 nav = nav,
                 onItemClick = { category ->
-                    nav.navigate(ScreenNames.QuizQuestionbyCat.createRoute(category.id))
+                    nav.navigate(
+                        ScreenNames.QuizQuestionbyCat.createRoute(
+                            category.id,
+                            category.name
+                        )
+                    )
+
+                }
+            )
+        }
+
+        composable(
+            route = ScreenNames.QuizQuestionbyCat.route,
+            arguments = listOf(
+                navArgument("id") { type = NavType.IntType },
+                navArgument("name") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            val id = backStackEntry.arguments?.getInt("id") ?: 0
+            val name = backStackEntry.arguments?.getString("name") ?: ""
+
+            QuizScreen(
+                categoryId = id,
+                categoryName = name,
+                onBack = { nav.popBackStack() },
+                onQuizFinished = { score ->
+                    // Puedes guardar el score aquí
+                    nav.popBackStack() // o ir a resultados
                 }
             )
         }

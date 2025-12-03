@@ -27,12 +27,10 @@ sealed class ScreenNames (val route: String) {
 
     data object QuizList: ScreenNames("quizList")
 
-    /// HACERRRRRRRRRRRRRR
-
-
-    data object QuizQuestionbyCat : ScreenNames("quizQuestioncat/{id}") {
-        fun createRoute(id: Int): String {
-            return "quizQuestioncat/$id"
+    data object QuizQuestionbyCat : ScreenNames("quizQuestioncat/{id}/{name}") {
+        fun createRoute(id: Int, name: String): String {
+            return "quizQuestioncat/$id/$name"
         }
     }
+
 }
