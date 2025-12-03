@@ -6,7 +6,10 @@ import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -19,6 +22,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -116,6 +120,36 @@ fun VideosporCatScreen(
                 color = Color.Black
             )
         }
+
+        LazyRow(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 50.dp, bottom = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            itemsIndexed(videos) { idx, video ->
+                val isSelected = idx == index
+
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(40))
+                        .background(
+                            if (isSelected) Color(0xFFBED2E0)
+                            else Color(0xFFEFF3F7)
+                        )
+                        .clickable { index = idx }
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = video.name,
+                        fontSize = 14.sp,
+                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                        color = Color.Black
+                    )
+                }
+            }
+        }
+
 
         Box(
             modifier = Modifier
