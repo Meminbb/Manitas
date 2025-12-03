@@ -111,9 +111,7 @@ fun MainNavigation(modifier: Modifier = Modifier) {
         }
 
 
-        //composable(ScreenNames.Quiz.route) {
-            //QuizScreen()
-        //}
+
 
         composable(ScreenNames.QuizList.route) {
             val categories = getCategories()
