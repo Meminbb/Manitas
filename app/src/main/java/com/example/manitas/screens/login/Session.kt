@@ -133,6 +133,9 @@ fun SessionScreen(nav: NavHostController) {
                 }
 
                 Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(194, 216, 229)
+                    ),
                     onClick = {
                         val trimmedEmail = email.trim()
                         val trimmedPassword = password.trim()

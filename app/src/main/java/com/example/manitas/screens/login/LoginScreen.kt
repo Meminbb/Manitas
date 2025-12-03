@@ -23,7 +23,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.manitas.R
 import androidx.navigation.NavHostController
-
+import com.example.manitas.navigation.ScreenNames
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
@@ -60,8 +61,17 @@ fun OneTimeVideo(
                 if (state == Player.STATE_ENDED) {
                     player.pause()
 
-                    nav.navigate("loginuser") {
-                        popUpTo("login")
+                    val auth = FirebaseAuth.getInstance()
+                    val userId = auth.currentUser?.uid
+
+                    if (!userId.isNullOrEmpty()) {
+                        nav.navigate(ScreenNames.Menu.route) {
+                            popUpTo(ScreenNames.LoginScreen.route) { inclusive = true }
+                        }
+                    } else {
+                        nav.navigate(ScreenNames.LoginUser.route) {
+                            popUpTo(ScreenNames.LoginScreen.route) { inclusive = true }
+                        }
                     }
                 }
             }
