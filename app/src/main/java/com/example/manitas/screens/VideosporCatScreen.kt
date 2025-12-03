@@ -1,13 +1,16 @@
 package com.example.manitas.screens
 
+import android.R.attr.contentDescription
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -29,11 +32,16 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.manitas.model.MediaType
 import com.example.manitas.model.Video
+import com.example.manitas.model.enableQuiz
+import com.example.manitas.model.getCategories
+import com.example.manitas.model.getNamebyId
 import com.example.manitas.model.getVideos
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
+
+//buscar como get el nombre de la categoria y como modificar true y false el quiz available
 @SuppressLint("LocalContextResourcesRead")
 @Composable
 fun VideosporCatScreen(
@@ -94,7 +102,7 @@ fun VideosporCatScreen(
             Spacer(Modifier.width(8.dp))
 
             Text(
-                text = "Categoría $idCategory",
+                text = categoryName, //envez de poner id category llama una función para get el name
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -107,15 +115,16 @@ fun VideosporCatScreen(
             contentAlignment = Alignment.Center
         ) {
             IconButton(
-                onClick = {
-                    index = if (index > 0) index - 1 else videos.lastIndex
-                },
+                onClick = { index-- },
+                enabled = index > 0,
                 modifier = Modifier.align(Alignment.CenterStart)
             ) {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowLeft,
-                    contentDescription = "Anterior"
-                )
+                if (index > 0) {
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowLeft,
+                        contentDescription = "Anterior"
+                    )
+                }
             }
 
             Card(
@@ -167,16 +176,33 @@ fun VideosporCatScreen(
                 }
             }
 
-            IconButton(
+            val context = LocalContext.current
+
+            IconButton( //cuando sea el ultimo no reinicia se cambia el icono y al clikcear manda un mensaje de a haz completado esta leccion se ha desbloqueado el quiz para esta categoria
                 onClick = {
-                    index = if (index < videos.lastIndex) index + 1 else 0
+                    if (index < videos.lastIndex)
+                    {
+                        index++
+                    } else {
+                        enableQuiz(idCategory, getCategories())
+
+                        Toast.makeText(
+                            context,
+                            "¡Has completado la lección! Se ha desbloqueado el quiz.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 },
                 modifier = Modifier.align(Alignment.CenterEnd)
             ) {
                 Icon(
-                    imageVector = Icons.Default.KeyboardArrowRight,
+                    imageVector = if (index < videos.lastIndex)
+                        Icons.Default.KeyboardArrowRight
+                    else
+                        Icons.Default.Check,
                     contentDescription = "Siguiente"
                 )
+
             }
         }
 
