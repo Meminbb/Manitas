@@ -61,7 +61,7 @@ fun VideosporCatScreen(
     var favSet by remember { mutableStateOf<Set<Int>>(emptySet()) }
 
     LaunchedEffect(userId) {
-        if (userId == null) return@LaunchedEffect
+        if (userId.isNullOrEmpty()) return@LaunchedEffect
 
         db.collection("users")
             .document(userId)
@@ -195,35 +195,29 @@ fun VideosporCatScreen(
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Medium
                 )
-                Text(
-                    text = "ResID: ${current.resId}",
-                    fontSize = 15.sp,
-                    color = Color.Gray
-                )
             }
+            if (!userId.isNullOrEmpty()) {
+                IconButton(
+                    onClick = {
+                        val docRef = db.collection("users").document(userId)
 
-            IconButton(
-                onClick = {
-                    if (userId == null) return@IconButton
+                        if (favSet.contains(current.id)) {
 
-                    val docRef = db.collection("users").document(userId)
-
-                    if (favSet.contains(current.id)) {
-
-                        favSet = favSet - current.id
-                        docRef.update("Fav", FieldValue.arrayRemove(current.id))
-                    } else {
-                        favSet = favSet + current.id
-                        docRef.update("Fav", FieldValue.arrayUnion(current.id))
+                            favSet = favSet - current.id
+                            docRef.update("Fav", FieldValue.arrayRemove(current.id))
+                        } else {
+                            favSet = favSet + current.id
+                            docRef.update("Fav", FieldValue.arrayUnion(current.id))
+                        }
                     }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "Fav",
+                        tint = if (isCurrentFav) Color.Red else Color.Gray,
+                        modifier = Modifier.size(28.dp)
+                    )
                 }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "Fav",
-                    tint = if (isCurrentFav) Color.Red else Color.Gray,
-                    modifier = Modifier.size(28.dp)
-                )
             }
         }
     }

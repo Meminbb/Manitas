@@ -12,9 +12,9 @@ object UserDataStore {
 
     private val USER_ID = stringPreferencesKey("user_id")
 
-    suspend fun saveUserId(context: Context, id: String) {
+    suspend fun saveUserId(context: Context, id: String?) {
         context.dataStore.edit { prefs ->
-            prefs[USER_ID] = id
+            prefs[USER_ID] = id as String
         }
     }
 

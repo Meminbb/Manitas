@@ -82,15 +82,16 @@ fun MenuScreen(
     val userId by userIdFlow.collectAsState(initial = null)
 
     var userName by remember { mutableStateOf<String?>(null) }
-    val db = FirebaseFirestore.getInstance()
 
     LaunchedEffect(userId) {
-        if (userId != null) {
+        if (!userId.isNullOrEmpty()) {
+            val db = FirebaseFirestore.getInstance()
             db.collection("users")
                 .document(userId!!)
                 .get()
                 .addOnSuccessListener { doc ->
-                    userName = doc.getString("username") ?: "Usuario"
+                    userName = doc.getString("username")?.replaceFirstChar { char -> char.uppercase() }
+                        ?: "Usuario"
                 }
                 .addOnFailureListener {
                     userName = "Usuario"
@@ -127,7 +128,7 @@ fun MenuScreen(
                 text = when {
                     userName != null -> "Hola, $userName"
                     userId == null -> "Cargando..."
-                    else -> "Hola"
+                    else -> "Hola, Invitado"
                 },
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,

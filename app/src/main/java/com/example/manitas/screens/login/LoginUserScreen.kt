@@ -1,7 +1,5 @@
 package com.example.manitas.screens.login
 
-import android.R.attr.onClick
-import android.R.attr.top
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,18 +16,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Blue
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.manitas.R
+import com.example.manitas.datastore.UserDataStore
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginUserScreen(nav: NavHostController) {
@@ -121,7 +121,16 @@ fun LoginUserScreen(nav: NavHostController) {
             }
 
             TextButton(
-                onClick = { nav.navigate("menu") },
+                onClick = {
+                    val context = nav.context
+
+                    FirebaseAuth.getInstance().signOut()
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        UserDataStore.saveUserId(context, "")
+                    }
+                    nav.navigate("menu")
+                          },
                 modifier = Modifier.padding(top = 20.dp)
             ) {
                 Text(

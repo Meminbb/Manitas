@@ -20,10 +20,6 @@ sealed class ScreenNames (val route: String) {
     data object Notificaciones: ScreenNames("notificaciones")
     data object Favoritos: ScreenNames("favoritos")
 
-    data object FavoritoDetalle : ScreenNames("favoritoDetalle/{id}") {
-        fun createRoute(id: Int) = "favoritoDetalle/$id"
-    }
-
 
     data object QuizList: ScreenNames("quizList")
 
