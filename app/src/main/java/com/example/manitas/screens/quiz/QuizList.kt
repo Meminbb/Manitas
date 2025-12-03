@@ -155,7 +155,8 @@ fun QuizCategoriesScreen(
             }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize()
+        .background(Color.White)) {
 
         Row(
             modifier = Modifier

@@ -23,8 +23,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DoorFront
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -52,7 +54,11 @@ import androidx.compose.ui.zIndex
 import com.example.manitas.datastore.UserDataStore
 import com.example.manitas.model.getVideos
 import com.example.manitas.navigation.ScreenNames
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun getImageFromRaw(resourceName: String): Bitmap? {
@@ -77,20 +83,20 @@ fun MenuScreen(
 ) {
     val context = LocalContext.current
 
-
     val userIdFlow = UserDataStore.getUserId(context)
     val userId by userIdFlow.collectAsState(initial = null)
 
     var userName by remember { mutableStateOf<String?>(null) }
-    val db = FirebaseFirestore.getInstance()
 
     LaunchedEffect(userId) {
-        if (userId != null) {
+        if (!userId.isNullOrEmpty()) {
+            val db = FirebaseFirestore.getInstance()
             db.collection("users")
                 .document(userId!!)
                 .get()
                 .addOnSuccessListener { doc ->
-                    userName = doc.getString("username") ?: "Usuario"
+                    userName = doc.getString("username")?.replaceFirstChar { char -> char.uppercase() }
+                        ?: "Usuario"
                 }
                 .addOnFailureListener {
                     userName = "Usuario"
@@ -127,7 +133,7 @@ fun MenuScreen(
                 text = when {
                     userName != null -> "Hola, $userName"
                     userId == null -> "Cargando..."
-                    else -> "Hola"
+                    else -> "Hola, Invitado"
                 },
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
@@ -234,6 +240,7 @@ fun MenuScreen(
                         onClick = { onNavigate(ScreenNames.Favoritos.route) }
                     )
                 }
+
             }
         }
 
@@ -241,8 +248,15 @@ fun MenuScreen(
             Column(
                 modifier = Modifier
                     .zIndex(1f)
-                    .align(Alignment.TopCenter)
-                    .padding(top = 130.dp, start = 16.dp, end = 16.dp)
+                    .align(Alignment.TopStart)
+                    .padding(
+                        start = 16.dp + 50.dp + 10.dp,
+                        end = 16.dp
+                    )
+                    .offset(
+
+                        y = 16.dp + 40.dp + 50.dp + 30.dp + 10.dp + 56.dp
+                    )
                     .fillMaxWidth()
                     .heightIn(max = 200.dp)
                     .shadow(6.dp, RoundedCornerShape(18.dp))
@@ -271,6 +285,28 @@ fun MenuScreen(
                     )
                 }
             }
+        }
+        FloatingActionButton(
+            onClick = {
+                val auth = FirebaseAuth.getInstance()
+                auth.signOut()
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    UserDataStore.saveUserId(context, "")
+                }
+
+                onNavigate(ScreenNames.LoginUser.route)
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.DoorFront,
+                contentDescription = "Log Out",
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
+            )
         }
     }
 }
@@ -308,4 +344,5 @@ private fun MenuCard(
             )
         }
     }
+
 }

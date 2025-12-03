@@ -93,7 +93,6 @@ fun SessionScreen(nav: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                // Email field
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it.replace(" ","").lowercase() },
@@ -109,7 +108,6 @@ fun SessionScreen(nav: NavHostController) {
                     )
                 )
 
-                // Password field
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it.replace(" ", "") },
@@ -135,6 +133,9 @@ fun SessionScreen(nav: NavHostController) {
                 }
 
                 Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(194, 216, 229)
+                    ),
                     onClick = {
                         val trimmedEmail = email.trim()
                         val trimmedPassword = password.trim()
@@ -187,12 +188,8 @@ fun signInWithEmail(email: String, password: String, auth: FirebaseAuth, nav: Na
                     nav.navigate("${ScreenNames.Menu.route}/$userId")
                 }
             } else {
-                // If authentication fails, show error
                 val errorMessage = task.exception?.message
-                // Display the error message in the UI
                 errorMessage?.let { error ->
-                    // Here we could update a state variable in your parent composable
-                    // that holds the error message and shows it persistently.
                     Toast.makeText(nav.context, error, Toast.LENGTH_LONG).show()
                 }
             }

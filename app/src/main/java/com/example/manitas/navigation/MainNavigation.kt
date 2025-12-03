@@ -62,6 +62,10 @@ fun MainNavigation(modifier: Modifier = Modifier) {
             NotificacionesAddScreen(nav = nav)
         }
 
+        composable("Favoritos"){
+            VideosFavoritosScreen(nav = nav)
+        }
+
 
         composable(ScreenNames.Progreso.route) {
             ProgresoScreen(nav = nav)
@@ -83,18 +87,6 @@ fun MainNavigation(modifier: Modifier = Modifier) {
         }
         composable(ScreenNames.CreateUserScreen.route){
             CreateUserScreen(nav = nav)
-        }
-
-        composable(
-            route = ScreenNames.FavoritoDetalle.route,
-            arguments = listOf(
-                navArgument("id") { type = NavType.IntType }
-            )
-        ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getInt("id") ?: 0
-            VideosFavoritosScreen(
-                nav = nav
-            )
         }
 
 
