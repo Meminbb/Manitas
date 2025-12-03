@@ -37,7 +37,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.manitas.model.MediaType
 import com.example.manitas.model.Video
-import com.example.manitas.model.enableQuiz
 import com.example.manitas.model.getCategories
 import com.example.manitas.model.getNamebyId
 import com.example.manitas.model.getVideos
@@ -46,7 +45,6 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
 
-//buscar como get el nombre de la categoria y como modificar true y false el quiz available
 @SuppressLint("LocalContextResourcesRead")
 @Composable
 fun VideosporCatScreen(
@@ -91,7 +89,6 @@ fun VideosporCatScreen(
     }
 
     val isCurrentFav = favSet.contains(current.id)
-    val localquizAv = quizAv.contains(current.id)
 
     Column(
         modifier = Modifier
@@ -99,32 +96,32 @@ fun VideosporCatScreen(
             .background(Color.White)
             .padding(horizontal = 24.dp, vertical = 12.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(top = 40.dp,bottom = 2.dp)
-        ) {
-            IconButton(onClick = { nav?.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBackIosNew,
-                    contentDescription = "Volver",
-                    tint = Color.Black
-                )
-            }
+        Row(modifier = Modifier
+            .padding(start = 6.dp, top = 40.dp)
+            .fillMaxWidth()) {
 
-            Spacer(Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.Filled.ArrowBackIosNew,
+                contentDescription = "Volver",
+                tint = Color.Black,
+                modifier = Modifier
+                    .size(40.dp)
+                    .padding(top = 13.dp)
+                    .clickable { nav?.popBackStack() }
+            )
+            Spacer(Modifier.width(9.dp))
 
             Text(
-                text = categoryName, //envez de poner id category llama una función para get el name
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
+                text = categoryName,
+                fontSize = 42.sp,
                 color = Color.Black
             )
         }
 
         LazyRow(
             modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 50.dp, bottom = 24.dp),
+
+                .padding(top = 25.dp, bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             itemsIndexed(videos) { idx, video ->

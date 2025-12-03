@@ -3,15 +3,7 @@ package com.example.manitas.screens.quiz
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,10 +12,9 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,7 +28,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.manitas.model.Category
 import com.example.manitas.model.getCategories
-
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Preview(showBackground = true)
 @Composable
@@ -55,6 +47,8 @@ fun QuizCategoriesScreenPreview() {
 @Composable
 fun QuizCategoryCard(
     category: Category,
+    isEnabled: Boolean,
+    score: Int,
     onItemClick: (Category) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -69,7 +63,13 @@ fun QuizCategoryCard(
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
             modifier = Modifier
                 .fillMaxSize()
-                .clickable { onItemClick(category) }
+                .then(
+                    if (isEnabled) {
+                        Modifier.clickable { onItemClick(category) }
+                    } else {
+                        Modifier
+                    }
+                )
         ) {
             Image(
                 painter = painterResource(id = category.img),
@@ -79,7 +79,7 @@ fun QuizCategoryCard(
             )
         }
 
-        // Tarjeta con el nombre de la categoría y su puntaje
+        // Tarjeta con nombre + puntaje
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = Color.White,
@@ -90,15 +90,31 @@ fun QuizCategoryCard(
 
                 Text(
                     text = category.name,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 28.sp
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 20.sp
                 )
 
-                // Muestra el puntaje de la categoría
                 Text(
-                    text = "Puntaje: ${category.score}",
-                    fontSize = 18.sp,
+                    text = "Puntaje: $score",
+                    fontSize = 13.sp,
                     color = Color.Gray
+                )
+            }
+        }
+
+        // Overlay si está bloqueado
+        if (!isEnabled) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0x88000000)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Termina la lección\npara desbloquear",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }
@@ -111,10 +127,37 @@ fun QuizCategoriesScreen(
     nav: NavHostController,
     onItemClick: (Category) -> Unit
 ) {
+    val auth = FirebaseAuth.getInstance()
+    val userId = auth.currentUser?.uid
+    val db = FirebaseFirestore.getInstance()
+
+    var unlockedIds by remember { mutableStateOf<Set<Int>>(emptySet()) }
+    var scoresByCategory by remember { mutableStateOf<Map<Int, Int>>(emptyMap()) }
+
+    LaunchedEffect(userId) {
+        if (userId == null) return@LaunchedEffect
+
+        db.collection("users")
+            .document(userId)
+            .get()
+            .addOnSuccessListener { doc ->
+                // quizzes desbloqueados
+                val quizAvList = doc.get("quizAv") as? List<Number>
+                val ids = quizAvList?.map { it.toInt() }?.toSet() ?: emptySet()
+                unlockedIds = ids
+
+                // mapa de scores
+                val scoresMap = doc.get("quizScores") as? Map<String, Number>
+                scoresByCategory = scoresMap
+                    ?.map { (key, value) -> key.toInt() to value.toInt() }
+                    ?.toMap()
+                    ?: emptyMap()
+            }
+    }
+
     Column(modifier = Modifier.fillMaxSize()
         .background(Color.White)) {
 
-        // Header
         Row(
             modifier = Modifier
                 .padding(start = 20.dp, top = 40.dp)
@@ -134,9 +177,13 @@ fun QuizCategoriesScreen(
             )
         }
 
-        // List of quiz categories
+        Spacer(Modifier.height(15.dp))
+
         LazyColumn {
             items(categories) { category ->
+
+                val enabled = unlockedIds.contains(category.id)
+                val score = scoresByCategory[category.id] ?: 0
 
                 Box(
                     modifier = Modifier
@@ -146,6 +193,8 @@ fun QuizCategoriesScreen(
                 ) {
                     QuizCategoryCard(
                         category = category,
+                        isEnabled = enabled,
+                        score = score,
                         onItemClick = onItemClick
                     )
                 }
