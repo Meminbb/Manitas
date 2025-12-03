@@ -30,6 +30,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,18 +46,64 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.manitas.datastore.UserDataStore
 import androidx.compose.ui.zIndex
 import com.example.manitas.model.getVideos
 import com.example.manitas.navigation.ScreenNames
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
+@Composable
+fun getImageFromRaw(resourceName: String): Bitmap? {
+    val context = LocalContext.current
+    val resourceId = context.resources.getIdentifier(resourceName, "raw", context.packageName)
+    if (resourceId == 0) return null
 
+    val inputStream = context.resources.openRawResource(resourceId)
+    return BitmapFactory.decodeStream(inputStream)
+}
 
+@Composable
+fun getVideoUriFromRaw(resourceName: String): Uri {
+    val context = LocalContext.current
+    val resourceId = context.resources.getIdentifier(resourceName, "raw", context.packageName)
+    return Uri.parse("android.resource://${context.packageName}/$resourceId")
+}
 
 @Composable
 fun MenuScreen(
-    onNavigate: (String) -> Unit,
-    userName: String = "Karla"
+    onNavigate: (String) -> Unit
 ) {
+    val context = LocalContext.current
+
+    val userIdFlow = UserDataStore.getUserId(context)
+    val userId by userIdFlow.collectAsState(initial = null)
+
+    var username by remember { mutableStateOf<String?>(null) }
+    val db = FirebaseFirestore.getInstance()
+
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            db.collection("users")
+                .document(userId!!)
+                .get()
+                .addOnSuccessListener { doc ->
+                    username = doc.getString("username") ?: "Usuario"
+                }
+                .addOnFailureListener {
+                    username = "Usuario"
+                }
+        }
+    }
+
+    var query by remember { mutableStateOf("") }
+    val sendas = getRawResourceFiles()
+
+    val filteredSendas = if (query.isNotEmpty()) {
+        sendas.filter { it.contains(query, ignoreCase = true) }
+    } else emptyList()
+
+    Column(
     val videos = getVideos()
     val sendas = videos.map { it.name }
 
@@ -70,6 +118,20 @@ fun MenuScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
+
+        Text(
+            text = when {
+                username != null -> "Hola, $username"
+                userId == null -> "Cargando..."
+                else -> "Cargando..."
+            },
+            fontSize = 40.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 30.dp, top = 40.dp),
+            textAlign = TextAlign.Center
+        )
 
         // MENÚ
         Column(
@@ -90,6 +152,28 @@ fun MenuScreen(
             )
 
 
+        if (query.isNotEmpty()) {
+            if (filteredSendas.isEmpty()) {
+                Text("No se encontraron resultados", fontSize = 14.sp)
+            } else {
+                LazyColumn {
+                    items(filteredSendas) { seña ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .clickable {
+                                    onNavigate(ScreenNames.SeñaDetail.createRoute(seña))
+                                }
+                        ) {
+                            val image = getImageFromRaw(seña)
+                            image?.let {
+                                Image(
+                                    bitmap = it.asImageBitmap(),
+                                    contentDescription = seña,
+                                    modifier = Modifier.size(64.dp)
+                                )
+                            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -141,6 +225,9 @@ fun MenuScreen(
                 onClick = { onNavigate(ScreenNames.Categorias.route) }
             )
 
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             Spacer(Modifier.height(20.dp))
 
             Row(
@@ -158,6 +245,11 @@ fun MenuScreen(
 
                 Column(
                     modifier = Modifier
+                        .fillMaxWidth()
+                        .height(137.dp),
+                    leading = { Icon(Icons.Default.Favorite, null) },
+                    onClick = { onNavigate(ScreenNames.FavoritoDetalle.route) }
+                )
                         .weight(1f)
                         .fillMaxHeight(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)

@@ -14,18 +14,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.manitas.R
+import com.example.manitas.datastore.UserDataStore
+import com.example.manitas.navigation.ScreenNames
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun SessionScreen(nav: NavHostController) {
     val bgColor = Color(194, 216, 229)
     val auth = FirebaseAuth.getInstance()
 
-    // Variables to hold input values
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
@@ -120,8 +125,6 @@ fun SessionScreen(nav: NavHostController) {
                     )
                 )
 
-
-                // Display the persistent error message if there's any
                 if (errorMessage.isNotEmpty()) {
                     Text(
                         text = errorMessage,
@@ -131,26 +134,43 @@ fun SessionScreen(nav: NavHostController) {
                     )
                 }
 
-                // Login button
                 Button(
                     onClick = {
-                        if (email.isNotEmpty() && password.isNotEmpty()) {
-                            signInWithEmail(email, password, auth, nav)
-                        } else {
+                        val trimmedEmail = email.trim()
+                        val trimmedPassword = password.trim()
+
+                        if (trimmedEmail.isEmpty() || trimmedPassword.isEmpty()) {
                             errorMessage = "Por favor ingrese correo y contraseña"
+                            return@Button
                         }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFBAD1E1),
-                        contentColor = Color.Black
-                    )
+
+                        auth.signInWithEmailAndPassword(trimmedEmail, trimmedPassword)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+
+                                    val userId = auth.currentUser?.uid
+                                    if (userId != null) {
+                                        val context = nav.context
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            UserDataStore.saveUserId(context, userId)
+                                        }
+                                    }
+
+                                    nav.navigate(ScreenNames.Menu.route) {
+                                        popUpTo(ScreenNames.LoginScreen.route) { inclusive = true }
+                                    }
+
+                                } else {
+                                    errorMessage = "Correo o contraseña incorrecta"
+                                }
+                            }
+                    }
                 ) {
-                    Text("Iniciar Sesión", fontSize = 18.sp)
+                    Text("Iniciar sesión",
+                        fontWeight = FontWeight.Bold)
                 }
+
+
             }
         }
     }
@@ -160,13 +180,11 @@ fun signInWithEmail(email: String, password: String, auth: FirebaseAuth, nav: Na
     auth.signInWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                // If the login is successful, get the user's UID
                 val user = auth.currentUser
-                val userId = user?.uid // This is the user ID
+                val userId = user?.uid
 
                 if (userId != null) {
-                    // Navigate to the "menu" screen and pass the user ID
-                    nav.navigate("menu/$userId") // Pass UID as part of the route
+                    nav.navigate("${ScreenNames.Menu.route}/$userId")
                 }
             } else {
                 // If authentication fails, show error
