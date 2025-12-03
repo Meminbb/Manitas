@@ -240,7 +240,7 @@ fun MenuScreen(
                     modifier = Modifier
                         .weight(1f)
                         .height(290.dp),
-                    onClick = { onNavigate(ScreenNames.Quiz.route) }
+                    onClick = { onNavigate(ScreenNames.QuizList.route) }
                 )
 
                 Column(
