@@ -23,8 +23,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DoorFront
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -52,7 +54,11 @@ import androidx.compose.ui.zIndex
 import com.example.manitas.datastore.UserDataStore
 import com.example.manitas.model.getVideos
 import com.example.manitas.navigation.ScreenNames
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun getImageFromRaw(resourceName: String): Bitmap? {
@@ -235,6 +241,7 @@ fun MenuScreen(
                         onClick = { onNavigate(ScreenNames.Favoritos.route) }
                     )
                 }
+
             }
         }
 
@@ -273,6 +280,28 @@ fun MenuScreen(
                 }
             }
         }
+        FloatingActionButton(
+            onClick = {
+                val auth = FirebaseAuth.getInstance()
+                auth.signOut()
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    UserDataStore.saveUserId(context, "")
+                }
+
+                onNavigate(ScreenNames.LoginUser.route)
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.DoorFront,
+                contentDescription = "Log Out",
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
+            )
+        }
     }
 }
 
@@ -309,4 +338,5 @@ private fun MenuCard(
             )
         }
     }
+
 }
