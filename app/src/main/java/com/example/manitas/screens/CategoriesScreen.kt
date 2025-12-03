@@ -97,13 +97,18 @@ fun CategoriesScreen(
 ) {
     Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
 
-        Row(modifier = Modifier.padding(start = 20.dp, top = 60.dp).fillMaxWidth()) {
+        Row(modifier = Modifier
+            .padding(start = 6.dp, top = 40.dp)
+            .fillMaxWidth()) {
 
             Icon(
                 imageVector = Icons.Filled.ArrowBackIosNew,
                 contentDescription = "Volver",
                 tint = Color.Black,
-                modifier = Modifier.size(40.dp).padding(top = 13.dp).clickable { nav.popBackStack() }
+                modifier = Modifier
+                    .size(40.dp)
+                    .padding(top = 13.dp)
+                    .clickable { nav.popBackStack() }
             )
             Spacer(Modifier.width(9.dp))
 
