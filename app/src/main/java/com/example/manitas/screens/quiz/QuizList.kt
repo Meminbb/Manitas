@@ -91,7 +91,8 @@ fun QuizCategoryCard(
                 Text(
                     text = category.name,
                     fontWeight = FontWeight.Normal,
-                    fontSize = 20.sp
+                    fontSize = 20.sp,
+                    color = Color.Black
                 )
 
                 Text(
@@ -166,6 +167,7 @@ fun QuizCategoriesScreen(
             Icon(
                 imageVector = Icons.Filled.ArrowBackIosNew,
                 contentDescription = "Volver",
+                tint = Color.Black,
                 modifier = Modifier
                     .size(40.dp)
                     .padding(top = 10.dp)
@@ -174,6 +176,7 @@ fun QuizCategoriesScreen(
             Text(
                 text = "Quizzes",
                 fontSize = 50.sp,
+                color = Color.Black
             )
         }
 
