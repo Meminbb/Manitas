@@ -80,8 +80,10 @@ fun QuizScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(horizontal = 24.dp)
+                .background(Color.White)
                 .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+
         ) {
 
             // Título
