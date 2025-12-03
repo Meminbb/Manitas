@@ -3,6 +3,7 @@ package com.example.manitas.screens.quiz
 import android.net.Uri
 import android.widget.FrameLayout
 import android.widget.VideoView
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -16,14 +17,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.example.manitas.model.getQuizQuestionsbyCat
 import androidx.compose.foundation.layout.WindowInsets
+import com.example.manitas.model.MediaType
+import com.example.manitas.model.getQuizQuestionsbyCat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,7 +107,7 @@ fun QuizScreen(
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
-            // VIDEO
+            // MEDIA (VIDEO o IMAGEN)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -112,7 +116,19 @@ fun QuizScreen(
                     .background(Color.Black),
                 contentAlignment = Alignment.Center
             ) {
-                SimpleVideoPlayer(mediaId = currentQuestion.mediaId)
+                when (currentQuestion.mediaType) {
+                    MediaType.VIDEO -> {
+                        SimpleVideoPlayer(mediaId = currentQuestion.mediaId)
+                    }
+                    MediaType.IMAGE -> {
+                        Image(
+                            painter = painterResource(id = currentQuestion.mediaId),
+                            contentDescription = currentQuestion.name,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
             }
 
             // Contador de preguntas
@@ -179,7 +195,6 @@ fun QuizScreen(
                     }
                 }
 
-                // Si la respuesta es incorrecta
                 if (isAnswerCorrect == false) {
                     Text(
                         text = "Respuesta Incorrecta",
@@ -197,14 +212,13 @@ fun QuizScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = " Respuesta correcta: ${currentQuestion.answerOptions[currentQuestion.correctAnswer]}",
+                            text = "Respuesta correcta: ${currentQuestion.answerOptions[currentQuestion.correctAnswer]}",
                             fontSize = 16.sp,
                             color = Color.Black
                         )
                     }
                 }
 
-                // Botón de siguiente
                 Button(
                     onClick = {
                         if (currentIndex < totalQuestions - 1) {
