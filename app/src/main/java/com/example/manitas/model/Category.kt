@@ -23,7 +23,7 @@ fun getCategories(): List<Category> = listOf(
     Category(1,"Frutas", "🍎", R.drawable.frutas, false,),
     Category(2,"Abecedario","🔤",R.drawable.abc, false),
     Category(6,"Comida", "🐶",R.drawable.comida_imagen, false),
-    Category(4,"Numeros", "🐶",R.drawable.numeros, false),
+    Category(4,"Números", "🐶",R.drawable.numeros, false),
     Category(5,"Saludos", "🐶",R.drawable.saludos, false),
     Category(3,"Ropa","🎨",R.drawable.ropa, false),
     Category(7,"Hogar", "🐶",R.drawable.hogar, false),

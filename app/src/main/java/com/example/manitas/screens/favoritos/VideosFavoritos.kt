@@ -1,5 +1,6 @@
 package com.example.manitas.screens.favoritos
 
+import android.R
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
@@ -135,7 +136,7 @@ fun VideosFavoritosScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Inicia sesión para ver tus favoritos.")
+                    Text("Inicia sesión para ver tus favoritos.", color = Color.Black)
                 }
             }
 
@@ -144,7 +145,7 @@ fun VideosFavoritosScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Aún no tienes videos en favoritos.")
+                    Text("Aún no tienes videos en favoritos.", color = Color.Black)
                 }
             }
 
@@ -172,10 +173,10 @@ fun VideosFavoritosScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth(0.75f)
-                            .fillMaxHeight(0.7f),
+                            .height(260.dp),
                         shape = RoundedCornerShape(24.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFE0E0E0)
+                            containerColor = Color(194, 216, 229)
                         )
                     ) {
                         Box(
@@ -244,7 +245,8 @@ fun VideosFavoritosScreen(
                         Text(
                             text = current.name,
                             fontSize = 22.sp,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            color = Color.Black
                         )
                     }
 
