@@ -8,7 +8,6 @@ object NotificacionesRepository {
 
     private val db = FirebaseFirestore.getInstance()
 
-    // 🔹 Obtener notificaciones con fecha y horas
     suspend fun getNotificaciones(): List<Notificacion> {
         return try {
             val snapshot = db.collection("notificaciones")
@@ -34,7 +33,6 @@ object NotificacionesRepository {
         }
     }
 
-    // 🔹 Agregar notificación completa
     suspend fun addNotificacion(
         title: String,
         message: String,
