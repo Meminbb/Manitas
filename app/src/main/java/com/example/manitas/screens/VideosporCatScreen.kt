@@ -40,6 +40,7 @@ import com.example.manitas.model.Video
 import com.example.manitas.model.getCategories
 import com.example.manitas.model.getNamebyId
 import com.example.manitas.model.getVideos
+import com.google.common.collect.Multimaps.index
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -61,8 +62,6 @@ fun VideosporCatScreen(
         } ?: 0
     }
 
-    var index by remember(videos, selectedVideoId) { mutableStateOf(initialIndex) }
-    val current = videos[index]
     val categoryName = getNamebyId(idCategory, getCategories())
 
 
@@ -87,8 +86,6 @@ fun VideosporCatScreen(
                 quizAv = list2?.map { it.toInt() }?.toSet() ?: emptySet()
             }
     }
-
-    val isCurrentFav = favSet.contains(current.id)
 
     Column(
         modifier = Modifier
@@ -117,6 +114,26 @@ fun VideosporCatScreen(
                 color = Color.Black
             )
         }
+
+        if (videos.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "Esta categoría aún no tiene videos disponibles.",
+                    fontSize = 20.sp,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Center
+                )
+            }
+            return
+        }
+
+        var index by remember(videos, selectedVideoId) { mutableStateOf(initialIndex) }
+        val current = videos[index]
+        val isCurrentFav = favSet.contains(current.id)
 
         LazyRow(
             modifier = Modifier

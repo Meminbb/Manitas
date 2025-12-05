@@ -39,9 +39,7 @@ fun getVideos(): List<Video> = listOf(
     Video(16, 2, "H", R.raw.letras_h, MediaType.IMAGE),
     Video(17, 2, "I", R.raw.letras_i, MediaType.IMAGE),
 
-    Video(18, 3, "Abrigo", R.raw.preguntas_como, MediaType.IMAGE),
-    Video(19, 3, "Color Naranja", R.raw.color_naranja, MediaType.IMAGE),
-    Video(20, 3, "Color Amarillo", R.raw.color_amarillo, MediaType.IMAGE),
+    Video(18, 3, "Abrigo", R.raw.ropa_abrigo, MediaType.VIDEO),
 
     Video(21, 4, "Número 1", R.raw.numero_1, MediaType.IMAGE),
     Video(22, 4, "Número 2", R.raw.numero_2, MediaType.IMAGE),
