@@ -64,7 +64,8 @@ fun QuizScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver"
+                            contentDescription = "Volver",
+                            tint = Color.Black
                         )
                     }
                 },
@@ -79,19 +80,20 @@ fun QuizScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .background(Color.White)
                 .padding(horizontal = 24.dp)
                 .background(Color.White)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-
         ) {
-
             // Título
+
             Text(
                 text = "Quiz",
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp),
+                color = Color.Black
             )
 
             // Categoría
@@ -99,14 +101,15 @@ fun QuizScreen(
                 text = categoryName,
                 fontSize = 18.sp,
                 color = Color.Gray,
-                modifier = Modifier.padding(bottom = 4.dp)
+                modifier = Modifier.padding(bottom = 4.dp),
             )
 
             // Pregunta
             Text(
                 text = currentQuestion.questionText,
                 fontSize = 18.sp,
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(bottom = 12.dp),
+                color = Color.Black
             )
 
             // MEDIA (VIDEO o IMAGEN)
