@@ -34,7 +34,7 @@ fun getCategories(): List<Category> = listOf(
 
 )
 
-fun getNamebyId(id: Int, categories: List<Category>): String { //usar este para progreso
+fun getNamebyId(id: Int, categories: List<Category>): String {
     return categories.find { it.id == id }?.name ?: "Categoría"
 }
 

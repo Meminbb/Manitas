@@ -219,7 +219,7 @@ fun VideosporCatScreen(
 
             val context = LocalContext.current
 
-            IconButton( //cuando sea el ultimo no reinicia se cambia el icono y al clikcear manda un mensaje de a haz completado esta leccion se ha desbloqueado el quiz para esta categoria
+            IconButton(
                 onClick = {
                     if (index < videos.lastIndex)
                     {
